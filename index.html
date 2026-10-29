@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Daily Wordsmith</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a single study column — dictionary-style header, four sequential stations (Learn → Recall → Reason → Write), then journal + word bank */
+:root{
+  --paper:#EDF0F5; --card:#FFFFFF; --ink:#1A1F2E; --muted:#5B6478; --rule:#D3D9E4;
+  --cobalt:#2F45D8; --cobalt-soft:#E3E7FB; --marker:#FFE45C; --marker-ink:#1A1F2E;
+  --good:#1E8A55; --good-soft:#DDF2E6; --bad:#C2413A; --bad-soft:#F8E1DF;
+  --f-display:"Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Literata", Georgia, "Times New Roman", serif;
+  --f-mono:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#11141B; --card:#1A1E28; --ink:#E6E9F0; --muted:#9AA3B8; --rule:#2C3242;
+  --cobalt:#8C9CFF; --cobalt-soft:#252C4A; --marker:#E8CC3A; --marker-ink:#14161C;
+  --good:#4CC48A; --good-soft:#173326; --bad:#F07A72; --bad-soft:#3A1E1C; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --paper:#11141B; --card:#1A1E28; --ink:#E6E9F0; --muted:#9AA3B8; --rule:#2C3242;
+  --cobalt:#8C9CFF; --cobalt-soft:#252C4A; --marker:#E8CC3A; --marker-ink:#14161C;
+  --good:#4CC48A; --good-soft:#173326; --bad:#F07A72; --bad-soft:#3A1E1C; color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:28px 64px}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.15}
+p{margin:0}
+.label{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--cobalt);outline-offset:2px}
+
+/* Header */
+.mast{display:flex;flex-direction:column;gap:14px}
+.mast-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.mast h1{font-size:clamp(34px,7vw,52px);font-weight:800;letter-spacing:-.02em}
+.mast h1 em{font-style:normal;color:var(--cobalt)}
+.entry-line{font-family:var(--f-body);font-style:italic;color:var(--muted);font-size:15px}
+.stats{display:flex;flex-wrap:wrap;gap:8px 22px;font-variant-numeric:tabular-nums}
+.stat{display:flex;align-items:baseline;gap:6px}
+.stat b{font-family:var(--f-display);font-size:24px;font-weight:700}
+.week{display:flex;gap:6px;align-items:center}
+.dot{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--rule);display:grid;place-items:center;font-family:var(--f-mono);font-size:10px;color:var(--muted)}
+.dot.done{background:var(--cobalt);border-color:var(--cobalt);color:var(--card)}
+.dot.today{border-color:var(--cobalt);border-width:2px}
+
+.steps{display:flex;gap:8px;flex-wrap:wrap;position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);padding:10px 0;border-bottom:1px solid var(--rule)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+.steps a{display:flex;align-items:center;gap:7px;text-decoration:none;color:var(--ink);font-family:var(--f-display);font-weight:500;font-size:14px;padding:6px 12px;border:1.5px solid var(--rule);border-radius:999px;background:var(--card)}
+.steps a .n{font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.steps a.done{border-color:var(--good);background:var(--good-soft)}
+.steps a.done .n{color:var(--good)}
+
+/* Stations */
+.station{background:var(--card);border:1px solid var(--rule);border-radius:14px;padding:22px clamp(16px,4vw,28px);display:flex;flex-direction:column;gap:18px;scroll-margin-top:72px}
+.st-head{display:flex;flex-direction:column;gap:4px}
+.st-head h2{font-size:26px;font-weight:700}
+.st-head p{color:var(--muted);font-size:15px}
+
+.words{display:flex;flex-direction:column;gap:0}
+.word{padding:18px 0;border-top:1px solid var(--rule);display:flex;flex-direction:column;gap:10px}
+.word:first-child{border-top:0;padding-top:4px}
+.headword{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 12px}
+.headword h3{font-size:30px;font-weight:800;letter-spacing:-.01em}
+.pron{font-family:var(--f-mono);font-size:13px;color:var(--muted)}
+.pos{font-style:italic;color:var(--cobalt)}
+.q{font-size:15px}
+.opts{display:grid;gap:8px}
+.opt{text-align:left;background:var(--paper);color:var(--ink);border:1.5px solid var(--rule);border-radius:10px;padding:10px 14px;font-family:var(--f-body);font-size:15px;line-height:1.45}
+.opt:hover:not(:disabled){border-color:var(--cobalt)}
+.opt:disabled{cursor:default}
+.opt.right{border-color:var(--good);background:var(--good-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.opt.dim{opacity:.55}
+.reveal{border-left:3px solid var(--cobalt);padding:4px 0 4px 14px;display:flex;flex-direction:column;gap:6px}
+.reveal .def{font-size:16px}
+.reveal .ex{font-style:italic;color:var(--muted)}
+.verdict{font-family:var(--f-mono);font-size:12px;letter-spacing:.04em}
+.verdict.g{color:var(--good)} .verdict.b{color:var(--bad)}
+
+.blank-item{display:flex;flex-direction:column;gap:10px;padding:14px 0;border-top:1px solid var(--rule)}
+.blank-item:first-child{border-top:0;padding-top:0}
+.sentence{font-size:17px}
+.sentence .gap{display:inline-block;min-width:90px;border-bottom:2px solid var(--cobalt);text-align:center;font-weight:600}
+.chips-opts{display:flex;flex-wrap:wrap;gap:8px}
+.chips-opts .opt{padding:7px 14px;font-family:var(--f-display);font-weight:500}
+
+.puzzle-type{display:inline-block;font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--cobalt);background:var(--cobalt-soft);padding:3px 9px;border-radius:999px;align-self:flex-start}
+.puzzle-q{font-size:18px;line-height:1.5}
+
+/* Write */
+.prompt-box{display:flex;flex-direction:column;gap:10px;padding:16px 18px;background:var(--cobalt-soft);border-radius:10px}
+.prompt-box .ptxt{font-family:var(--f-display);font-weight:600;font-size:21px;line-height:1.3}
+.prompt-row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.tip{font-size:14.5px}
+.tip b{font-family:var(--f-display)}
+.linkbtn{background:none;border:0;color:var(--cobalt);font-family:var(--f-mono);font-size:12px;padding:4px 0;text-decoration:underline;text-underline-offset:3px}
+.targets{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tchip{font-family:var(--f-display);font-weight:600;font-size:14px;padding:5px 12px;border-radius:6px;border:1.5px dashed var(--rule);color:var(--muted);background:var(--card)}
+.tchip.used{background:var(--marker);color:var(--marker-ink);border:1.5px solid var(--marker)}
+.tchip small{font-family:var(--f-mono);font-weight:400;font-size:10px;margin-left:4px;opacity:.8}
+textarea{width:100%;min-height:220px;resize:vertical;font-family:var(--f-body);font-size:17px;line-height:1.7;color:var(--ink);background:var(--paper);border:1.5px solid var(--rule);border-radius:10px;padding:14px 16px}
+textarea:focus{border-color:var(--cobalt);outline:none}
+.checks{display:flex;flex-wrap:wrap;gap:6px 18px;font-family:var(--f-mono);font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.checks .ok{color:var(--good)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{background:var(--cobalt);color:var(--card);border:0;border-radius:10px;padding:11px 20px;font-family:var(--f-display);font-weight:700;font-size:15px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--cobalt);border:1.5px solid var(--cobalt)}
+.note{font-size:14px;color:var(--muted)}
+
+.feedback{display:flex;flex-direction:column;gap:16px;border-top:2px solid var(--ink);padding-top:16px}
+.scores{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px 20px}
+.score{display:flex;flex-direction:column;gap:4px}
+.pips{display:flex;gap:4px}
+.pip{width:100%;height:7px;border-radius:2px;background:var(--rule)}
+.pip.on{background:var(--cobalt)}
+.fb-overall{font-size:17px;font-style:italic}
+.fb-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+.fb-cols ul{margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:15px}
+.upgrade{display:flex;flex-direction:column;gap:6px;font-size:15px}
+.upgrade .before{text-decoration:line-through;text-decoration-color:var(--bad);color:var(--muted)}
+.upgrade .after{background:var(--good-soft);padding:6px 10px;border-radius:6px}
+.wu{display:flex;flex-direction:column;gap:6px;font-size:14.5px}
+.wu div b{font-family:var(--f-display)}
+
+/* Journal + bank */
+.lower{display:grid;grid-template-columns:1fr;gap:28px}
+.journal-entry{border-top:1px solid var(--rule);padding:12px 0;display:flex;flex-direction:column;gap:4px}
+.journal-entry:first-of-type{border-top:0}
+.journal-entry .jp{font-family:var(--f-display);font-weight:600}
+.journal-entry .jt{font-size:14.5px;color:var(--muted);overflow-wrap:anywhere}
+.bank{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px 22px}
+.bank div{display:flex;flex-direction:column;gap:2px;padding:8px 0;border-top:1px solid var(--rule)}
+.bank b{font-family:var(--f-display);font-size:17px}
+.bank span{font-size:14px;color:var(--muted);line-height:1.4}
+.empty{color:var(--muted);font-style:italic;font-size:15px}
+.sync{font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+@media (prefers-reduced-motion: no-preference){ .reveal,.feedback{animation:rise .35s ease both} @keyframes rise{from{transform:translateY(6px)}to{transform:none}} }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="mast">
+    <div class="mast-top">
+      <h1>Daily <em>Wordsmith</em></h1>
+      <span class="sync" id="sync">Saved on this device</span>
+    </div>
+    <p class="entry-line" id="entryLine"></p>
+    <div class="stats">
+      <div class="stat"><b id="sStreak">0</b><span class="label">day streak</span></div>
+      <div class="stat"><b id="sXP">0</b><span class="label">XP</span></div>
+      <div class="stat"><b id="sWords">0</b><span class="label">words learned</span></div>
+      <div class="week" id="week" aria-label="Last 7 days"></div>
+    </div>
+  </header>
+
+  <nav class="steps" id="steps" aria-label="Today's activities"></nav>
+
+  <section class="station" id="learn">
+    <div class="st-head"><span class="label">Station 1 · Learn</span><h2>Today's three words</h2>
+      <p>Guess each meaning first. Guessing before you're told helps the word stick.</p></div>
+    <div class="words" id="learnList"></div>
+  </section>
+
+  <section class="station" id="recall">
+    <div class="st-head"><span class="label">Station 2 · Recall</span><h2>Fill the gap</h2>
+      <p id="recallSub">Words from earlier days come back here so you don't forget them.</p></div>
+    <div id="recallList"></div>
+  </section>
+
+  <section class="station" id="reason">
+    <div class="st-head"><span class="label">Station 3 · Reason</span><h2>Think it through</h2>
+      <p>One puzzle a day: logic, analogies, and spotting weak arguments.</p></div>
+    <div id="reasonBox" style="display:flex;flex-direction:column;gap:14px"></div>
+  </section>
+
+  <section class="station" id="write">
+    <div class="st-head"><span class="label">Station 4 · Write</span><h2>Write a paragraph</h2>
+      <p>Aim for 80–150 words. Use at least two of today's words, plus the review word if there is one.</p></div>
+    <div class="prompt-box">
+      <div class="prompt-row"><span class="puzzle-type" id="pType">Describe</span><button class="linkbtn" id="nextPrompt" type="button">Try a different prompt</button></div>
+      <p class="ptxt" id="pText"></p>
+      <p class="tip" id="pTip"></p>
+    </div>
+    <div class="targets" id="targets"></div>
+    <label class="label" for="essay">Your paragraph</label>
+    <textarea id="essay" placeholder="Start with a sentence that tells the reader your main idea…"></textarea>
+    <div class="checks" id="checks"></div>
+    <div class="actions">
+      <button class="btn" id="submitBtn" type="button">Get feedback</button>
+      <span class="note" id="submitNote"></span>
+    </div>
+    <div id="fbBox"></div>
+  </section>
+
+  <div class="lower">
+    <section class="station" id="bankSec">
+      <div class="st-head"><span class="label">Word bank</span><h2>Words you've learned</h2></div>
+      <div class="bank" id="bank"></div>
+    </section>
+    <section class="station" id="journalSec">
+      <div class="st-head"><span class="label">Journal</span><h2>Past paragraphs</h2></div>
+      <div id="journal"></div>
+    </section>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+/* ---------- Content ---------- */
+const W = [
+["candid","adj.","KAN-did","Truthful and straightforward; frank.","She gave a candid answer about why the project failed."],
+["meticulous","adj.","muh-TIK-yuh-lus","Showing great attention to detail; very careful.","He kept a meticulous record of every expense."],
+["ambiguous","adj.","am-BIG-yoo-us","Open to more than one interpretation; unclear.","The ending of the film was ambiguous, and we argued about it for an hour."],
+["resilient","adj.","rih-ZIL-yent","Able to recover quickly from difficulty.","The resilient town rebuilt its library within a year of the flood."],
+["scrutinize","verb","SKROO-tuh-nize","To examine closely and critically.","Before signing the lease, scrutinize every clause."],
+["pragmatic","adj.","prag-MAT-ik","Dealing with things sensibly and realistically.","Instead of a perfect plan, we chose a pragmatic one we could finish by Friday."],
+["eloquent","adj.","EL-uh-kwent","Fluent and persuasive in speaking or writing.","Her eloquent speech moved the room to silence."],
+["tenacious","adj.","tuh-NAY-shus","Holding firmly to a goal; persistent.","The tenacious reporter called the office every day for a month."],
+["ubiquitous","adj.","yoo-BIK-wih-tus","Present or found everywhere.","Phones have become so ubiquitous that a room without one feels strange."],
+["mitigate","verb","MIT-ih-gate","To make something less severe or harmful.","Planting trees along the street can mitigate summer heat."],
+["benevolent","adj.","buh-NEV-uh-lent","Well-meaning and kind.","A benevolent neighbor left groceries on our porch every week."],
+["conundrum","noun","kuh-NUN-drum","A confusing and difficult problem.","Choosing between two good job offers was a real conundrum."],
+["diligent","adj.","DIL-ih-jent","Careful and hardworking.","A diligent student reviews her notes the same night."],
+["ephemeral","adj.","ih-FEM-er-ul","Lasting for a very short time.","The ephemeral beauty of cherry blossoms draws crowds every spring."],
+["juxtapose","verb","JUK-stuh-pose","To place things side by side to show contrast.","The photographer likes to juxtapose old buildings with new glass towers."],
+["lucid","adj.","LOO-sid","Expressed clearly; easy to understand.","His lucid explanation made the math finally click."],
+["nuance","noun","NOO-ahns","A subtle difference in meaning, tone, or feeling.","A good translator notices every nuance of tone."],
+["obsolete","adj.","ob-suh-LEET","No longer used; out of date.","Fax machines are nearly obsolete in most offices."],
+["plausible","adj.","PLAW-zuh-bul","Seeming reasonable or likely to be true.","The detective needed a plausible motive before making an arrest."],
+["reconcile","verb","REK-un-sile","To restore friendly relations; to make two things agree.","It took the brothers years to reconcile after the argument."],
+["succinct","adj.","suk-SINGKT","Brief and clearly expressed.","Keep your summary succinct: three sentences at most."],
+["tangible","adj.","TAN-juh-bul","Real and able to be seen, touched, or measured.","The new park was a tangible result of the town's fundraising."],
+["verbose","adj.","ver-BOSE","Using more words than needed.","The report was so verbose that nobody finished reading it."],
+["alleviate","verb","uh-LEE-vee-ate","To make pain, stress, or a problem less severe.","A short walk can alleviate stress after a long meeting."],
+["cultivate","verb","KUL-tuh-vate","To develop or improve something through effort.","Reading every day helps you cultivate a richer vocabulary."],
+["deter","verb","dih-TUR","To discourage someone from doing something.","Bright lights deter people from breaking into the shop."],
+["empathy","noun","EM-puh-thee","The ability to understand and share another person's feelings.","Her empathy made her a gifted nurse."],
+["frugal","adj.","FROO-gul","Careful with money; avoiding waste.","Being frugal for a year let him travel the next summer."],
+["gregarious","adj.","grih-GAIR-ee-us","Fond of company; sociable.","Our gregarious host introduced everyone by name."],
+["hinder","verb","HIN-der","To create difficulties that slow progress.","Heavy rain will hinder the construction schedule."],
+["impartial","adj.","im-PAR-shul","Treating all sides fairly; not biased.","A referee must stay impartial even when fans shout."],
+["lethargic","adj.","luh-THAR-jik","Sluggish and lacking energy.","After the huge lunch, the whole team felt lethargic."],
+["novice","noun","NOV-is","A beginner; someone new to an activity.","Even a novice can bake this bread on the first try."],
+["ominous","adj.","OM-uh-nus","Suggesting that something bad will happen.","Ominous clouds gathered over the stadium."],
+["persevere","verb","pur-suh-VEER","To keep going despite difficulty.","If you persevere with practice, the guitar gets easier."],
+["quandary","noun","KWON-duh-ree","A state of uncertainty about what to do.","She was in a quandary about whether to tell her friend the truth."],
+["reticent","adj.","RET-uh-sent","Not revealing one's thoughts or feelings readily.","He was reticent about his past, so we never asked."],
+["skeptical","adj.","SKEP-tih-kul","Not easily convinced; having doubts.","Scientists stay skeptical until results are repeated."],
+["trivial","adj.","TRIV-ee-ul","Of little value or importance.","Don't waste the meeting on trivial details."],
+["vindicate","verb","VIN-dih-kate","To clear of blame, or to show to be right.","The new evidence will vindicate the accused man."],
+["wary","adj.","WAIR-ee","Cautious about possible dangers or problems.","Be wary of emails that ask for your password."],
+["zealous","adj.","ZEL-us","Having great energy and passion for a cause.","The zealous volunteers knocked on every door in the district."],
+["articulate","adj.","ar-TIK-yuh-lit","Able to express ideas clearly and effectively.","The articulate student explained her project without notes."],
+["coherent","adj.","koh-HEER-ent","Logical and consistent; holding together well.","Each paragraph should build a coherent argument."],
+["inevitable","adj.","in-EV-ih-tuh-bul","Certain to happen; unavoidable.","With no practice, losing the match felt inevitable."],
+["anecdote","noun","AN-ik-dote","A short, interesting story about a real event.","He opened his talk with a funny anecdote about his first job."],
+["contemplate","verb","KON-tem-plate","To think deeply about something.","She sat by the lake to contemplate her next move."],
+["profound","adj.","pruh-FOUND","Very great or intense; showing deep insight.","The book had a profound effect on how I see my parents."],
+["advocate","verb","AD-vuh-kate","To publicly support or recommend.","Many doctors advocate walking after meals."],
+["concede","verb","kun-SEED","To admit something is true, often reluctantly.","After the recount, the candidate had to concede the race."],
+["discern","verb","dih-SURN","To notice or recognize something that isn't obvious.","It's hard to discern sarcasm in a text message."]
+].map(a=>({w:a[0],pos:a[1],pr:a[2],def:a[3],ex:a[4]}));
+const BY = Object.fromEntries(W.map(x=>[x.w,x]));
+
+const P = [
+["Analogy","Author is to novel as composer is to ___.",["symphony","orchestra","piano","audience"],0,"An author creates a novel; a composer creates a symphony. The relationship is creator → work."],
+["Deduction","All of Maya's notebooks are blue. This notebook is not blue. What must be true?",["This notebook is not Maya's.","This notebook is Maya's.","Maya has no notebooks.","Nothing can be concluded."],0,"If every one of Maya's notebooks is blue, a notebook that isn't blue can't be hers."],
+["Spot the flaw","\"Every time I wash my car, it rains. So washing my car causes rain.\" What's wrong with this reasoning?",["It confuses things happening together with one causing the other.","It attacks the person instead of the argument.","It offers only two options.","Nothing; the reasoning is sound."],0,"This is the correlation/causation mistake. Two events happening together doesn't prove one causes the other."],
+["Pattern","2, 6, 12, 20, 30, ?",["42","40","36","44"],0,"The gaps grow by 2 each time: +4, +6, +8, +10, so next is +12 → 42."],
+["Deduction","Ana is taller than Ben. Ben is taller than Cy. Dee is shorter than Cy. Who is the shortest?",["Dee","Cy","Ben","Can't tell"],0,"Order from tallest: Ana > Ben > Cy > Dee."],
+["Evidence","Claim: \"The new bus route reduced traffic downtown.\" Which fact supports this best?",["Car counts downtown fell 15% after launch, while nearby areas saw no drop.","The mayor says the route is working.","The new buses are painted bright green.","Several riders say they like the route."],0,"Only the first is measured data, and it includes a comparison group that rules out other explanations."],
+["Analogy","Drought is to rain as famine is to ___.",["food","hunger","crop","farmer"],0,"A drought is a lack of rain; a famine is a lack of food."],
+["Hidden assumption","\"Liam studied for ten hours, so he will pass the exam.\" What does this argument assume?",["Ten hours of studying is enough to pass.","Liam likes the subject.","The exam is next week.","Other students studied less."],0,"The conclusion only follows if ten hours of study is enough. That unstated link is the assumption."],
+["Spot the flaw","\"Either we ban all phones at school, or students will never learn anything.\" What's the flaw?",["It pretends there are only two options.","It uses a statistic incorrectly.","It changes the meaning of a word.","It relies on an expert's opinion."],0,"This is a false dilemma. Many middle-ground options exist, like phone-free class time."],
+["Deduction","If it snows, school closes. School did not close. What follows?",["It did not snow.","It snowed.","School might close tomorrow.","Nothing follows."],0,"If snow always closes school, and school stayed open, there can't have been snow."],
+["Logic trap","If it snows, school closes. School closed today. What follows?",["We can't be sure it snowed.","It definitely snowed.","It did not snow.","School will close tomorrow."],0,"School could close for other reasons (a power outage, a holiday). The rule only works in one direction."],
+["Odd one out","Which word doesn't belong: lucid, coherent, succinct, verbose?",["verbose","lucid","coherent","succinct"],0,"Lucid, coherent, and succinct all describe good, clear writing. Verbose means wordy, which is a flaw."],
+["Pattern","A, C, F, J, O, ?",["U","T","S","V"],0,"The letter gaps grow: +2, +3, +4, +5, +6. O + 6 = U."],
+["Numbers","A shirt costs $40 after a 20% discount. What was the original price?",["$50","$48","$60","$45"],0,"$40 is 80% of the original. 40 ÷ 0.8 = $50."],
+["Time","If yesterday was two days after Monday, what day is tomorrow?",["Friday","Thursday","Wednesday","Saturday"],0,"Two days after Monday is Wednesday (yesterday), so today is Thursday and tomorrow is Friday."],
+["Spot the flaw","\"Don't trust Dr. Lee's study on sleep. She's always late to meetings.\" What's wrong?",["It attacks the person instead of the evidence.","It generalizes from one example.","It assumes what it's trying to prove.","It mixes up cause and effect."],0,"This is an ad hominem argument. Being late has nothing to do with the quality of her research."],
+["Spot the flaw","A gym surveys its members: 90% exercise weekly. It concludes 90% of the city exercises weekly. What's wrong?",["The sample doesn't represent the whole city.","The number is too high to believe.","Surveys are never useful.","It should have asked more questions."],0,"Gym members are more likely to exercise than the average person, so the sample is biased."],
+["Analogy","Pen is to writer as scalpel is to ___.",["surgeon","hospital","knife","patient"],0,"A pen is a writer's main tool; a scalpel is a surgeon's main tool."],
+["Deduction","Kim, Raj, and Lu ordered tea, coffee, and juice (one each). Kim didn't order coffee. Raj ordered juice. What did Kim order?",["Tea","Coffee","Juice","Can't tell"],0,"Raj has juice, and Kim didn't take coffee, so Kim has tea."],
+["Writing logic","\"The plan was cheap. ___, it took twice as long as expected.\" Which transition fits best?",["However","Therefore","For example","Similarly"],0,"The second sentence contrasts with the first (cheap but slow), so you need a contrast word like 'However'."],
+["Evidence","Which detail would most strengthen a paragraph arguing that public libraries still matter?",["Library visits in the city rose 12% last year.","The writer's favorite book is a mystery.","Libraries have existed for a long time.","Everyone agrees libraries are nice."],0,"A specific, checkable figure supports the claim far better than opinions or vague statements."]
+];
+const PROMPTS = [
+["Describe","Describe a place you went to as a child so clearly that a reader could walk through it."],
+["Argue","Should schools start later in the morning? Take a side and defend it."],
+["Narrate","Write about a time you changed your mind about something important."],
+["Explain","Explain how to do something you're good at to someone who has never tried it."],
+["Imagine","You wake up and every clock in the world has stopped. What happens next?"],
+["Reflect","What small habit makes your day better, and why does it work?"],
+["Argue","Is it better to be a specialist or a generalist? Pick one and make your case."],
+["Describe","Describe the sounds and smells of a rainy evening in a city."],
+["Compare","Compare learning from a book with learning from a video. Which sticks better for you?"],
+["Narrate","Tell the story of an ordinary object in your room from the object's point of view."],
+["Persuade","Convince a friend to try a food they've always refused."],
+["Reflect","What advice would you give yourself from five years ago?"],
+["Argue","Should people be allowed to bring pets to work?"],
+["Explain","Explain why a tradition in your family or culture matters."],
+["Imagine","Invent a new holiday and explain how people celebrate it."],
+["Describe","Describe a person you admire using only their actions, not adjectives about them."],
+["Argue","Do smartphones make us more connected or more isolated?"],
+["Narrate","Write about the first five minutes after receiving surprising news."],
+["Reflect","What is something you were bad at and got better at? How did it happen?"],
+["Compare","City life or small-town life: which would you choose for the next ten years, and why?"],
+["Explain","Explain a problem in your neighborhood and one practical way to fix it."]
+];
+const TIPS = [
+["Topic sentence","Open with one sentence that states your main idea plainly."],
+["One strong example","Support your point with a single specific, concrete example."],
+["Vary sentence length","Mix short punchy sentences with longer ones."],
+["Strong ending","Close with a sentence that ties back to your opening idea."],
+["Transitions","Link your ideas with words like however, because, as a result, for instance."],
+["Show, don't tell","Use details the reader can see, hear, or feel instead of naming emotions."],
+["Cut the filler","Remove words like very, really, and just. Make every word earn its place."]
+];
+
+/* ---------- Dates & seeded randomness ---------- */
+const pad=n=>String(n).padStart(2,"0");
+const keyOf=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const fromKey=k=>{const [y,m,d]=k.split("-").map(Number);return new Date(y,m-1,d);};
+const ANCHOR=new Date(2026,9,29);
+const dayIdx=k=>Math.round((fromKey(k)-ANCHOR)/86400000);
+const TODAY=keyOf(new Date());
+function hash(s){let h=2166136261;for(const c of s){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}return h>>>0;}
+function rng(seed){let a=seed;return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function shuffle(arr,r){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const mod=(n,m)=>((n%m)+m)%m;
+const wordsFor=k=>{const i=dayIdx(k);return [0,1,2].map(j=>W[mod(i*3+j,W.length)]);};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const stemRe=w=>new RegExp("\\b"+w.replace(/(e|y)$/,"")+"\\w*","i");
+
+/* ---------- State ---------- */
+const LS="daily-wordsmith-v1";
+let S={v:1,days:{}};
+try{const raw=localStorage.getItem(LS);if(raw)S=JSON.parse(raw)||S;}catch(e){}
+if(!S.days)S.days={};
+let dbRef=null, saveT=null;
+function day(k=TODAY){if(!S.days[k])S.days[k]={learn:{},recall:{},reason:null,write:{text:"",promptShift:0}};return S.days[k];}
+function save(){
+  clearTimeout(saveT);
+  saveT=setTimeout(async()=>{
+    try{localStorage.setItem(LS,JSON.stringify(S));}catch(e){}
+    if(dbRef){try{await dbRef.set(JSON.parse(JSON.stringify(S)));setSync("Synced to your account");}catch(e){setSync("Saved on this device");}}
+  },500);
+}
+const setSync=t=>{document.getElementById("sync").textContent=t;};
+
+/* derived */
+function learnDone(k){const d=S.days[k];return !!d&&wordsFor(k).every(w=>d.learn[w.w]!==undefined);}
+function learned(){const out=[];Object.keys(S.days).sort().forEach(k=>{if(learnDone(k))wordsFor(k).forEach(w=>{if(!out.includes(w.w))out.push(w.w);});});return out;}
+function xpTotal(){let xp=0;for(const k in S.days){const d=S.days[k];const ws=wordsFor(k);
+  ws.forEach(w=>{const a=d.learn[w.w];if(a!==undefined){xp+=5;if(a===w.def)xp+=5;}});
+  (d.recall.items||[]).forEach(it=>{if(d.recall[it.w]===it.w)xp+=10;});
+  if(d.reason!=null)xp+=d.reason===0?20:5;
+  if(d.write&&d.write.done)xp+=30+(d.write.bonus?10:0);}return xp;}
+function streak(){let n=0;let d=new Date();const done=k=>S.days[k]&&S.days[k].write&&S.days[k].write.done;
+  if(!done(keyOf(d)))d.setDate(d.getDate()-1);
+  while(done(keyOf(d))){n++;d.setDate(d.getDate()-1);}return n;}
+const stepDone={learn:()=>learnDone(TODAY),
+  recall:()=>{const d=day();return (d.recall.items||[]).length>0&&d.recall.items.every(it=>d.recall[it.w]!==undefined);},
+  reason:()=>day().reason!=null, write:()=>!!day().write.done};
+
+/* ---------- Header ---------- */
+function renderHeader(){
+  const t=fromKey(TODAY);const n=dayIdx(TODAY)+1;
+  document.getElementById("entryLine").textContent=t.toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric",year:"numeric"})+(n>0?"  ·  Day "+n+" of practice":"");
+  document.getElementById("sStreak").textContent=streak();
+  document.getElementById("sXP").textContent=xpTotal();
+  document.getElementById("sWords").textContent=learned().length;
+  const wk=document.getElementById("week");wk.innerHTML="";
+  for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const k=keyOf(d);
+    const el=document.createElement("span");el.className="dot"+(S.days[k]&&S.days[k].write&&S.days[k].write.done?" done":"")+(i===0?" today":"");
+    el.textContent=d.toLocaleDateString(undefined,{weekday:"narrow"});el.title=d.toLocaleDateString();wk.appendChild(el);}
+  const steps=[["learn","Learn"],["recall","Recall"],["reason","Reason"],["write","Write"]];
+  document.getElementById("steps").innerHTML=steps.map(([id,l],i)=>`<a href="#${id}" class="${stepDone[id]()?"done":""}"><span class="n">${stepDone[id]()?"✓":i+1}</span>${l}</a>`).join("");
+}
+
+/* ---------- Learn ---------- */
+function renderLearn(){
+  const d=day();const ws=wordsFor(TODAY);
+  document.getElementById("learnList").innerHTML=ws.map((w,i)=>{
+    const r=rng(hash(TODAY+w.w));
+    const others=shuffle(W.filter(x=>x.w!==w.w&&x.pos===w.pos),r).slice(0,3).map(x=>x.def);
+    const opts=shuffle([w.def,...others],r);
+    const ans=d.learn[w.w];
+    const optHtml=opts.map(o=>{let c="opt";if(ans!==undefined){if(o===w.def)c+=" right";else if(o===ans)c+=" wrong";else c+=" dim";}
+      return `<button class="${c}" data-learn="${esc(w.w)}" data-v="${esc(o)}" ${ans!==undefined?"disabled":""}>${esc(o)}</button>`;}).join("");
+    const rev=ans!==undefined?`<div class="reveal"><span class="verdict ${ans===w.def?"g":"b"}">${ans===w.def?"NICE GUESS · +10 XP":"NOW YOU KNOW · +5 XP"}</span><p class="def">${esc(w.def)}</p><p class="ex">“${esc(w.ex)}”</p></div>`:"";
+    return `<div class="word"><div class="headword"><h3>${esc(w.w)}</h3><span class="pron">/${esc(w.pr)}/</span><span class="pos">${esc(w.pos)}</span></div>
+      ${ans===undefined?`<p class="q">What do you think <b>${esc(w.w)}</b> means?</p>`:""}<div class="opts">${optHtml}</div>${rev}</div>`;
+  }).join("");
+}
+
+/* ---------- Recall ---------- */
+function recallItems(){
+  const d=day();
+  if(d.recall.items&&d.recall.items.length)return d.recall.items;
+  const r=rng(hash(TODAY+"recall"));
+  const today=wordsFor(TODAY).map(w=>w.w);
+  const prev=shuffle(learned().filter(w=>!today.includes(w)),r);
+  let pick=prev.slice(0,3);
+  if(pick.length<4) pick=pick.concat(shuffle(today,r).slice(0,4-pick.length));
+  pick=pick.slice(0,4);
+  d.recall.items=pick.map(w=>{const others=shuffle(W.filter(x=>x.w!==w),r).slice(0,3).map(x=>x.w);return {w,opts:shuffle([w,...others],r),prev:!today.includes(w)};});
+  return d.recall.items;
+}
+function renderRecall(){
+  const d=day();const items=recallItems();
+  const anyPrev=items.some(i=>i.prev);
+  document.getElementById("recallSub").textContent=anyPrev?"Words from earlier days come back here so you don't forget them.":"Your first day: these use today's words. From tomorrow, earlier words will return here.";
+  document.getElementById("recallList").innerHTML=items.map(it=>{
+    const w=BY[it.w];const ans=d.recall[it.w];
+    const parts=w.ex.split(stemRe(w.w));const m=w.ex.match(stemRe(w.w));
+    const sent=esc(parts[0])+`<span class="gap">${ans!==undefined?esc(m?m[0]:w.w):"&nbsp;"}</span>`+esc(parts.slice(1).join(""));
+    const opts=it.opts.map(o=>{let c="opt";if(ans!==undefined){if(o===it.w)c+=" right";else if(o===ans)c+=" wrong";else c+=" dim";}
+      return `<button class="${c}" data-recall="${esc(it.w)}" data-v="${esc(o)}" ${ans!==undefined?"disabled":""}>${esc(o)}</button>`;}).join("");
+    const v=ans!==undefined?`<span class="verdict ${ans===it.w?"g":"b"}">${ans===it.w?"CORRECT · +10 XP":"IT WAS “"+esc(it.w).toUpperCase()+"”: "+esc(w.def)}</span>`:"";
+    return `<div class="blank-item">${it.prev?'<span class="label">Review</span>':'<span class="label">Today</span>'}<p class="sentence">${sent}</p><div class="chips-opts">${opts}</div>${v}</div>`;
+  }).join("");
+}
+
+/* ---------- Reason ---------- */
+function renderReason(){
+  const d=day();const p=P[mod(dayIdx(TODAY),P.length)];
+  const r=rng(hash(TODAY+"reason"));
+  const order=shuffle([0,1,2,3],r);
+  const ans=d.reason;
+  const opts=order.map(i=>{let c="opt";if(ans!=null){if(i===0)c+=" right";else if(i===ans)c+=" wrong";else c+=" dim";}
+    return `<button class="${c}" data-reason="${i}" ${ans!=null?"disabled":""}>${esc(p[2][i])}</button>`;}).join("");
+  document.getElementById("reasonBox").innerHTML=`<span class="puzzle-type">${esc(p[0])}</span><p class="puzzle-q">${esc(p[1])}</p><div class="opts">${opts}</div>`+
+    (ans!=null?`<div class="reveal"><span class="verdict ${ans===0?"g":"b"}">${ans===0?"CORRECT · +20 XP":"NOT QUITE · +5 XP FOR TRYING"}</span><p>${esc(p[4])}</p></div>`:"");
+}
+
+/* ---------- Write ---------- */
+function promptFor(){const d=day();return PROMPTS[mod(dayIdx(TODAY)*5+(d.write.promptShift||0),PROMPTS.length)];}
+function tipFor(){return TIPS[mod(dayIdx(TODAY),TIPS.length)];}
+function reviewWord(){const today=wordsFor(TODAY).map(w=>w.w);const prev=learned().filter(w=>!today.includes(w));
+  if(!prev.length)return null;return prev[Math.floor(rng(hash(TODAY+"rw"))()*prev.length)];}
+function analyze(text){
+  const words=(text.match(/[A-Za-z’'-]+/g)||[]);
+  const sents=text.split(/[.!?]+(\s|$)/).filter(s=>s&&s.trim().split(/\s+/).length>1);
+  const ws=wordsFor(TODAY).map(w=>w.w);const rw=reviewWord();
+  const usedToday=ws.filter(w=>stemRe(w).test(text));const usedRev=rw&&stemRe(rw).test(text);
+  const filler=(text.match(/\b(very|really|just|things?|stuff)\b/gi)||[]).length;
+  return {n:words.length,s:sents.length,avg:sents.length?Math.round(words.length/sents.length):0,usedToday,usedRev,rw,filler,
+    ready:words.length>=50&&usedToday.length>=2&&(!rw||usedRev),all:usedToday.length===3&&(!rw||usedRev)};
+}
+function renderWriteStatic(){
+  const p=promptFor();const t=tipFor();
+  document.getElementById("pType").textContent=p[0];
+  document.getElementById("pText").textContent=p[1];
+  document.getElementById("pTip").innerHTML=`<b>Focus: ${esc(t[0])}.</b> ${esc(t[1])}`;
+  document.getElementById("nextPrompt").hidden=!!day().write.done;
+  const ta=document.getElementById("essay");if(ta.value!==day().write.text)ta.value=day().write.text||"";
+  renderWriteLive();renderFeedback();
+}
+function renderWriteLive(){
+  const text=document.getElementById("essay").value;const a=analyze(text);
+  const ws=wordsFor(TODAY).map(w=>w.w);
+  document.getElementById("targets").innerHTML='<span class="label">Use:</span>'+ws.map(w=>`<span class="tchip ${a.usedToday.includes(w)?"used":""}" title="${esc(BY[w].def)}">${esc(w)}<small>today</small></span>`).join("")+
+    (a.rw?`<span class="tchip ${a.usedRev?"used":""}" title="${esc(BY[a.rw].def)}">${esc(a.rw)}<small>review</small></span>`:"");
+  const c=(ok,t)=>`<span class="${ok?"ok":""}">${ok?"✓":"○"} ${t}</span>`;
+  document.getElementById("checks").innerHTML=c(a.n>=80,a.n+" words (aim 80–150)")+c(a.s>=4,a.s+" sentences")+
+    c(a.avg>=8&&a.avg<=24,"avg "+a.avg+" words/sentence")+c(a.usedToday.length>=2,a.usedToday.length+"/3 today's words")+
+    (a.rw?c(a.usedRev,"review word"):"")+c(a.filler===0,a.filler+" filler words");
+  const btn=document.getElementById("submitBtn");const note=document.getElementById("submitNote");
+  btn.disabled=!a.ready||busy;
+  btn.textContent=day().write.feedback?"Get feedback on revision":"Get feedback";
+  if(!busy)note.textContent=a.ready?(sampleFn?"":"Feedback isn't available here, so your entry will be saved with the checks above."):
+    (a.n<50?"Write at least 50 words to submit.":"Use at least two of today's words"+(a.rw?" and the review word":"")+".");
+}
+let busy=false, sampleFn=null;
+async function submitWriting(){
+  const text=document.getElementById("essay").value.trim();const a=analyze(text);if(!a.ready)return;
+  const d=day();const first=!d.write.done;
+  d.write.text=text;d.write.done=true;d.write.bonus=d.write.bonus||a.all;d.write.prompt=promptFor()[1];
+  save();renderAll(false);
+  if(first)document.getElementById("submitNote").textContent="Entry saved · +"+(30+(a.all?10:0))+" XP";
+  if(!sampleFn){renderFeedback();return;}
+  busy=true;renderWriteLive();
+  const note=document.getElementById("submitNote");note.textContent="Reading your paragraph… this can take up to a minute.";
+  const ws=wordsFor(TODAY).concat(a.rw?[BY[a.rw]]:[]);
+  const prompt=`You are a supportive but honest writing coach for an adult improving their English writing, vocabulary, and reasoning. Evaluate the paragraph below.
+
+Writing prompt: ${promptFor()[1]}
+Focus skill today: ${tipFor()[0]} — ${tipFor()[1]}
+Target vocabulary (word: meaning):
+${ws.map(w=>"- "+w.w+": "+w.def).join("\n")}
+
+Paragraph:
+"""${text}"""
+
+Return ONLY a JSON object with this shape:
+{"scores":{"clarity":1-5,"organization":1-5,"vocabulary":1-5,"grammar":1-5},
+"overall":"one encouraging, specific sentence",
+"strengths":["2 short specific strengths"],
+"improve":["2-3 short, specific, actionable suggestions, one about the focus skill"],
+"grammar_fixes":[{"original":"exact short phrase with an error","fix":"corrected phrase"}],
+"word_usage":[{"word":"target word","used":true,"correct":true,"note":"short note on how it was used, or a model sentence if unused or misused"}],
+"upgrade":{"original":"one sentence copied from the paragraph","better":"a stronger rewrite of that sentence"}}
+Include every target word in word_usage. grammar_fixes may be empty. Be concise.`;
+  try{
+    const fb=await sampleFn.json(prompt,{modelTier:"default"});
+    d.write.feedback=fb;save();note.textContent="Feedback ready. Revise and resubmit as often as you like.";
+  }catch(e){
+    const code=e&&e.code;
+    note.textContent=code==="not_granted"?"Feedback is turned off for this page. Your entry is saved.":
+      code==="rate_limited"?"Too many requests right now. Try again in a minute; your entry is saved.":
+      "Couldn't get feedback just now. Your entry is saved, so try again shortly.";
+  }
+  busy=false;renderWriteLive();renderFeedback();
+}
+function renderFeedback(){
+  const box=document.getElementById("fbBox");const fb=day().write.feedback;
+  if(!fb){box.innerHTML="";return;}
+  const sc=fb.scores||{};const lab={clarity:"Clarity",organization:"Organization",vocabulary:"Vocabulary",grammar:"Grammar"};
+  const pips=v=>'<div class="pips">'+[1,2,3,4,5].map(i=>`<span class="pip ${i<=v?"on":""}"></span>`).join("")+"</div>";
+  const li=a=>(Array.isArray(a)?a:[]).map(x=>`<li>${esc(x)}</li>`).join("");
+  box.innerHTML=`<div class="feedback"><span class="label">Coach's notes</span>
+    <p class="fb-overall">${esc(fb.overall||"")}</p>
+    <div class="scores">${Object.keys(lab).map(k=>`<div class="score"><span class="label">${lab[k]} · ${Number(sc[k])||0}/5</span>${pips(Number(sc[k])||0)}</div>`).join("")}</div>
+    <div class="fb-cols"><div><span class="label">What works</span><ul>${li(fb.strengths)}</ul></div><div><span class="label">Try next</span><ul>${li(fb.improve)}</ul></div></div>
+    ${(fb.grammar_fixes||[]).length?`<div class="upgrade"><span class="label">Grammar fixes</span>${fb.grammar_fixes.map(g=>`<div><span class="before">${esc(g.original)}</span> → <b>${esc(g.fix)}</b></div>`).join("")}</div>`:""}
+    <div class="wu"><span class="label">Vocabulary use</span>${(fb.word_usage||[]).map(u=>`<div><b>${esc(u.word)}</b> <span class="verdict ${u.used&&u.correct?"g":"b"}">${u.used?(u.correct?"USED WELL":"CHECK USAGE"):"NOT USED"}</span> ${esc(u.note||"")}</div>`).join("")}</div>
+    ${fb.upgrade&&fb.upgrade.better?`<div class="upgrade"><span class="label">Sentence upgrade</span><p class="before">${esc(fb.upgrade.original)}</p><p class="after">${esc(fb.upgrade.better)}</p></div>`:""}
+  </div>`;
+}
+
+/* ---------- Journal & bank ---------- */
+function renderLower(){
+  const L=learned();
+  document.getElementById("bank").innerHTML=L.length?L.slice().reverse().map(w=>`<div><b>${esc(w)}</b><span>${esc(BY[w].def)}</span></div>`).join(""):
+    '<p class="empty">Finish Station 1 to add today\'s words here.</p>';
+  const ks=Object.keys(S.days).filter(k=>S.days[k].write&&S.days[k].write.done).sort().reverse();
+  document.getElementById("journal").innerHTML=ks.length?ks.map(k=>{const w=S.days[k].write;
+    return `<div class="journal-entry"><span class="label">${esc(fromKey(k).toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"}))}</span><p class="jp">${esc(w.prompt||"")}</p><p class="jt">${esc(w.text)}</p></div>`;}).join(""):
+    '<p class="empty">Your paragraphs will collect here, one per day.</p>';
+}
+
+function renderAll(withWrite=true){renderHeader();renderLearn();renderRecall();renderReason();if(withWrite)renderWriteStatic();else renderWriteLive();renderLower();}
+
+/* ---------- Events ---------- */
+document.addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b||b.disabled)return;
+  const d=day();
+  if(b.dataset.learn){d.learn[b.dataset.learn]=b.dataset.v;save();renderAll(false);renderWriteLive();}
+  else if(b.dataset.recall){d.recall[b.dataset.recall]=b.dataset.v;save();renderAll(false);}
+  else if(b.dataset.reason!==undefined){d.reason=Number(b.dataset.reason);save();renderAll(false);}
+  else if(b.id==="nextPrompt"){d.write.promptShift=(d.write.promptShift||0)+1;save();renderWriteStatic();}
+  else if(b.id==="submitBtn"){submitWriting();}
+});
+document.getElementById("essay").addEventListener("input",e=>{day().write.text=e.target.value;save();renderWriteLive();});
+
+renderAll();
+
+/* ---------- Capabilities: account sync + AI feedback ---------- */
+(async()=>{
+  if(!window.claude||!window.claude.use)return;
+  try{sampleFn=await window.claude.use("sample");renderWriteLive();}catch(e){}
+  try{
+    const [db,user]=await Promise.all([window.claude.use("db"),window.claude.use("user")]);
+    if(!db||!user)return;const id=await user.id();if(!id)return;
+    dbRef=db.collection("data/users/"+id).doc("progress");
+    const snap=await dbRef.get();
+    if(snap.exists){const remote=snap.data()||{};const rd=remote.days||{};
+      for(const k in rd){const loc=S.days[k];
+        if(!loc)S.days[k]=JSON.parse(JSON.stringify(rd[k]));
+        else{const r=rd[k];
+          loc.learn=Object.assign({},r.learn||{},loc.learn);
+          loc.recall=Object.assign({},r.recall||{},loc.recall);
+          if(loc.reason==null&&r.reason!=null)loc.reason=r.reason;
+          if(r.write&&r.write.done&&!(loc.write&&loc.write.done))loc.write=JSON.parse(JSON.stringify(r.write));}}
+    }
+    setSync("Synced to your account");save();renderAll();
+  }catch(e){}
+})();
+})();
+</script>
+</body>
+</html>
