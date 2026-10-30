@@ -4,27 +4,48 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
-<title>Daily Wordsmith</title>
+<title>WordSmith</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<!-- Pixelify Sans = chunky retro-game headings/buttons, VT323 = old terminal labels, Literata = readable body text -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=VT323&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&display=swap">
 <style>
-/* Layout: a single study column — dictionary-style header, four sequential stations (Learn → Recall → Reason → Write), then journal + word bank */
+/* Layout: a home screen (title scene + About dialog + 4-button menu) that opens four views:
+   Daily Challenge (Learn → Recall → Reason → Write), Random Facts, Test your Knowledge, Scores/History.
+   Look: light-pink, cozy pixel-art "vintage game" — squared corners, chunky stepped borders, dialog boxes. */
 :root{
-  --paper:#EDF0F5; --card:#FFFFFF; --ink:#1A1F2E; --muted:#5B6478; --rule:#D3D9E4;
-  --cobalt:#2F45D8; --cobalt-soft:#E3E7FB; --marker:#FFE45C; --marker-ink:#1A1F2E;
-  --good:#1E8A55; --good-soft:#DDF2E6; --bad:#C2413A; --bad-soft:#F8E1DF;
-  --f-display:"Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  /* Light theme: soft pink paper, plum ink (like the text in an old RPG dialog box) */
+  --paper:#FBEEF3; --card:#FFF9FB; --ink:#4A3A68; --muted:#8B7A9F; --rule:#EBCFDC;
+  --accent:#D45F8C; --accent-soft:#FBE0EA; --marker:#FFE1A1; --marker-ink:#4A3A68;
+  --good:#4F9463; --good-soft:#E1F2E3; --bad:#CC4A5A; --bad-soft:#FBE0E3;
+  /* Pixel kit colors: --edge = the dark pixel outline, --face/--shade = button top & bevel */
+  --edge:#6A4F86; --face:#FFE6EF; --shade:#F2B8CD; --hi:#FFFFFF;
+  --primary-face:#F7A8C4; --primary-shade:#D9799E;
+  /* Title scene: stepped sky bands (lavender → blush) and a soft green hill */
+  --sky1:#D8CCEA; --sky2:#E4D2EA; --sky3:#F0DAE9; --sky4:#F8E3EC; --hill:#A9CC9C; --hill-dark:#86B07A; --moon:#FFF1B8;
+  --f-pixel:"Pixelify Sans", "Courier New", monospace;
+  --f-display:var(--f-pixel);
   --f-body:"Literata", Georgia, "Times New Roman", serif;
-  --f-mono:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  --f-mono:"VT323", ui-monospace, Menlo, Consolas, monospace;
 }
+/* Dark theme: the same game "at night" — dusky purple sky, pink highlights */
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
-  --paper:#11141B; --card:#1A1E28; --ink:#E6E9F0; --muted:#9AA3B8; --rule:#2C3242;
-  --cobalt:#8C9CFF; --cobalt-soft:#252C4A; --marker:#E8CC3A; --marker-ink:#14161C;
-  --good:#4CC48A; --good-soft:#173326; --bad:#F07A72; --bad-soft:#3A1E1C; color-scheme:dark } }
+  --paper:#251D3A; --card:#30264B; --ink:#F7E9F1; --muted:#BDAACF; --rule:#4A3B68;
+  --accent:#F59BC2; --accent-soft:#4A3560; --marker:#E9C46A; --marker-ink:#251D3A;
+  --good:#7FD39A; --good-soft:#203D33; --bad:#FF8A96; --bad-soft:#4A2433;
+  --edge:#120C22; --face:#4A3A6B; --shade:#382B55; --hi:#6C5891;
+  --primary-face:#C45A8A; --primary-shade:#943F69;
+  --sky1:#231C3D; --sky2:#2F2450; --sky3:#432D5E; --sky4:#5A3868; --hill:#3F5E4A; --hill-dark:#2F4A39; --moon:#FFE9A8;
+  color-scheme:dark } }
 :root[data-theme="dark"]{
-  --paper:#11141B; --card:#1A1E28; --ink:#E6E9F0; --muted:#9AA3B8; --rule:#2C3242;
-  --cobalt:#8C9CFF; --cobalt-soft:#252C4A; --marker:#E8CC3A; --marker-ink:#14161C;
-  --good:#4CC48A; --good-soft:#173326; --bad:#F07A72; --bad-soft:#3A1E1C; color-scheme:dark }
+  --paper:#251D3A; --card:#30264B; --ink:#F7E9F1; --muted:#BDAACF; --rule:#4A3B68;
+  --accent:#F59BC2; --accent-soft:#4A3560; --marker:#E9C46A; --marker-ink:#251D3A;
+  --good:#7FD39A; --good-soft:#203D33; --bad:#FF8A96; --bad-soft:#4A2433;
+  --edge:#120C22; --face:#4A3A6B; --shade:#382B55; --hi:#6C5891;
+  --primary-face:#C45A8A; --primary-shade:#943F69;
+  --sky1:#231C3D; --sky2:#2F2450; --sky3:#432D5E; --sky4:#5A3868; --hill:#3F5E4A; --hill-dark:#2F4A39; --moon:#FFE9A8;
+  color-scheme:dark }
+/* Pixel frame: four flat shadows draw a 3px outline with notched (pixel-rounded) corners */
+:root{ --frame:0 -3px 0 0 var(--edge), 0 3px 0 0 var(--edge), -3px 0 0 0 var(--edge), 3px 0 0 0 var(--edge); }
 
 *{box-sizing:border-box}
 body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6;
@@ -32,33 +53,33 @@ body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-siz
 .wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
 h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.15}
 p{margin:0}
-.label{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.label{font-family:var(--f-mono);font-size:17px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 button{font:inherit;cursor:pointer}
-:focus-visible{outline:2px solid var(--cobalt);outline-offset:2px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
 /* Header */
 .mast{display:flex;flex-direction:column;gap:14px}
 .mast-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
 .mast h1{font-size:clamp(34px,7vw,52px);font-weight:800;letter-spacing:-.02em}
-.mast h1 em{font-style:normal;color:var(--cobalt)}
+.mast h1 em{font-style:normal;color:var(--accent)}
 .entry-line{font-family:var(--f-body);font-style:italic;color:var(--muted);font-size:15px}
 .stats{display:flex;flex-wrap:wrap;gap:8px 22px;font-variant-numeric:tabular-nums}
 .stat{display:flex;align-items:baseline;gap:6px}
 .stat b{font-family:var(--f-display);font-size:24px;font-weight:700}
 .week{display:flex;gap:6px;align-items:center}
-.dot{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--rule);display:grid;place-items:center;font-family:var(--f-mono);font-size:10px;color:var(--muted)}
-.dot.done{background:var(--cobalt);border-color:var(--cobalt);color:var(--card)}
-.dot.today{border-color:var(--cobalt);border-width:2px}
+.dot{width:26px;height:26px;border-radius:0;border:2px solid var(--rule);display:grid;place-items:center;font-family:var(--f-mono);font-size:15px;color:var(--muted)}
+.dot.done{background:var(--accent);border-color:var(--accent);color:var(--card)}
+.dot.today{border-color:var(--accent);border-width:2px}
 
 .steps{display:flex;gap:8px;flex-wrap:wrap;position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);padding:10px 0;border-bottom:1px solid var(--rule)}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
-.steps a{display:flex;align-items:center;gap:7px;text-decoration:none;color:var(--ink);font-family:var(--f-display);font-weight:500;font-size:14px;padding:6px 12px;border:1.5px solid var(--rule);border-radius:999px;background:var(--card)}
-.steps a .n{font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.steps a{display:flex;align-items:center;gap:7px;text-decoration:none;color:var(--ink);font-family:var(--f-display);font-weight:500;font-size:14px;padding:6px 12px;border:2px solid var(--edge);border-radius:0;background:var(--face);box-shadow:inset -2px -2px 0 var(--shade)}
+.steps a .n{font-family:var(--f-mono);font-size:16px;color:var(--muted)}
 .steps a.done{border-color:var(--good);background:var(--good-soft)}
 .steps a.done .n{color:var(--good)}
 
 /* Stations */
-.station{background:var(--card);border:1px solid var(--rule);border-radius:14px;padding:22px clamp(16px,4vw,28px);display:flex;flex-direction:column;gap:18px;scroll-margin-top:72px}
+.station{background:var(--card);border:0;border-radius:0;box-shadow:var(--frame),inset 0 -4px 0 var(--accent-soft);padding:22px clamp(16px,4vw,28px);display:flex;flex-direction:column;gap:18px;scroll-margin-top:72px}
 .st-head{display:flex;flex-direction:column;gap:4px}
 .st-head h2{font-size:26px;font-weight:700}
 .st-head p{color:var(--muted);font-size:15px}
@@ -68,65 +89,67 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .word:first-child{border-top:0;padding-top:4px}
 .headword{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 12px}
 .headword h3{font-size:30px;font-weight:800;letter-spacing:-.01em}
-.pron{font-family:var(--f-mono);font-size:13px;color:var(--muted)}
-.pos{font-style:italic;color:var(--cobalt)}
+.pron{font-family:var(--f-mono);font-size:18px;color:var(--muted)}
+.pos{font-style:italic;color:var(--accent)}
 .q{font-size:15px}
 .opts{display:grid;gap:8px}
-.opt{text-align:left;background:var(--paper);color:var(--ink);border:1.5px solid var(--rule);border-radius:10px;padding:10px 14px;font-family:var(--f-body);font-size:15px;line-height:1.45}
-.opt:hover:not(:disabled){border-color:var(--cobalt)}
+.opt{text-align:left;background:var(--paper);color:var(--ink);border:2px solid var(--rule);border-radius:0;box-shadow:inset -3px -3px 0 var(--accent-soft);padding:10px 14px;font-family:var(--f-body);font-size:15px;line-height:1.45}
+.opt:hover:not(:disabled){border-color:var(--edge);background:var(--face)}
 .opt:disabled{cursor:default}
 .opt.right{border-color:var(--good);background:var(--good-soft)}
 .opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
 .opt.dim{opacity:.55}
-.reveal{border-left:3px solid var(--cobalt);padding:4px 0 4px 14px;display:flex;flex-direction:column;gap:6px}
+.reveal{border-left:4px solid var(--accent);padding:4px 0 4px 14px;display:flex;flex-direction:column;gap:6px}
 .reveal .def{font-size:16px}
 .reveal .ex{font-style:italic;color:var(--muted)}
-.verdict{font-family:var(--f-mono);font-size:12px;letter-spacing:.04em}
+.verdict{font-family:var(--f-mono);font-size:17px;letter-spacing:.04em}
 .verdict.g{color:var(--good)} .verdict.b{color:var(--bad)}
 
 .blank-item{display:flex;flex-direction:column;gap:10px;padding:14px 0;border-top:1px solid var(--rule)}
 .blank-item:first-child{border-top:0;padding-top:0}
 .sentence{font-size:17px}
-.sentence .gap{display:inline-block;min-width:90px;border-bottom:2px solid var(--cobalt);text-align:center;font-weight:600}
+.sentence .gap{display:inline-block;min-width:90px;border-bottom:2px solid var(--accent);text-align:center;font-weight:600}
 .chips-opts{display:flex;flex-wrap:wrap;gap:8px}
 .chips-opts .opt{padding:7px 14px;font-family:var(--f-display);font-weight:500}
 
-.puzzle-type{display:inline-block;font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--cobalt);background:var(--cobalt-soft);padding:3px 9px;border-radius:999px;align-self:flex-start}
+.puzzle-type{display:inline-block;font-family:var(--f-mono);font-size:16px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);padding:1px 9px;border-radius:0;border:2px solid currentColor;align-self:flex-start}
 .puzzle-q{font-size:18px;line-height:1.5}
 
 /* Write */
-.prompt-box{display:flex;flex-direction:column;gap:10px;padding:16px 18px;background:var(--cobalt-soft);border-radius:10px}
+.prompt-box{display:flex;flex-direction:column;gap:10px;padding:16px 18px;background:var(--accent-soft);border-radius:0;border:2px dashed var(--accent)}
 .prompt-box .ptxt{font-family:var(--f-display);font-weight:600;font-size:21px;line-height:1.3}
 .prompt-row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 .tip{font-size:14.5px}
 .tip b{font-family:var(--f-display)}
-.linkbtn{background:none;border:0;color:var(--cobalt);font-family:var(--f-mono);font-size:12px;padding:4px 0;text-decoration:underline;text-underline-offset:3px}
+.linkbtn{background:none;border:0;color:var(--accent);font-family:var(--f-mono);font-size:17px;padding:4px 0;text-decoration:underline;text-underline-offset:3px}
 .targets{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.tchip{font-family:var(--f-display);font-weight:600;font-size:14px;padding:5px 12px;border-radius:6px;border:1.5px dashed var(--rule);color:var(--muted);background:var(--card)}
-.tchip.used{background:var(--marker);color:var(--marker-ink);border:1.5px solid var(--marker)}
-.tchip small{font-family:var(--f-mono);font-weight:400;font-size:10px;margin-left:4px;opacity:.8}
-textarea{width:100%;min-height:220px;resize:vertical;font-family:var(--f-body);font-size:17px;line-height:1.7;color:var(--ink);background:var(--paper);border:1.5px solid var(--rule);border-radius:10px;padding:14px 16px}
-textarea:focus{border-color:var(--cobalt);outline:none}
-.checks{display:flex;flex-wrap:wrap;gap:6px 18px;font-family:var(--f-mono);font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.tchip{font-family:var(--f-display);font-weight:600;font-size:14px;padding:5px 12px;border-radius:0;border:2px dashed var(--rule);color:var(--muted);background:var(--card)}
+.tchip.used{background:var(--marker);color:var(--marker-ink);border:2px solid var(--marker)}
+.tchip small{font-family:var(--f-mono);font-weight:400;font-size:14px;margin-left:4px;opacity:.8}
+textarea{width:100%;min-height:220px;resize:vertical;font-family:var(--f-body);font-size:17px;line-height:1.7;color:var(--ink);background:var(--paper);border:2px solid var(--rule);border-radius:0;padding:14px 16px}
+textarea:focus{border-color:var(--accent);outline:none}
+.checks{display:flex;flex-wrap:wrap;gap:6px 18px;font-family:var(--f-mono);font-size:17px;color:var(--muted);font-variant-numeric:tabular-nums}
 .checks .ok{color:var(--good)}
 .actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.btn{background:var(--cobalt);color:var(--card);border:0;border-radius:10px;padding:11px 20px;font-family:var(--f-display);font-weight:700;font-size:15px}
+.btn{background:var(--primary-face);color:var(--ink);border:0;border-radius:0;padding:11px 20px;margin:3px;font-family:var(--f-display);font-weight:700;font-size:15px;
+  box-shadow:var(--frame),0 6px 0 0 var(--edge),inset -3px -3px 0 var(--primary-shade),inset 3px 3px 0 rgba(255,255,255,.35)}
+.btn:active:not(:disabled){transform:translateY(3px);box-shadow:var(--frame),inset -3px -3px 0 var(--primary-shade)}
 .btn:disabled{opacity:.45;cursor:not-allowed}
-.btn.ghost{background:transparent;color:var(--cobalt);border:1.5px solid var(--cobalt)}
+.btn.ghost{background:var(--face);box-shadow:var(--frame),0 6px 0 0 var(--edge),inset -3px -3px 0 var(--shade)}
 .note{font-size:14px;color:var(--muted)}
 
 .feedback{display:flex;flex-direction:column;gap:16px;border-top:2px solid var(--ink);padding-top:16px}
 .scores{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px 20px}
 .score{display:flex;flex-direction:column;gap:4px}
 .pips{display:flex;gap:4px}
-.pip{width:100%;height:7px;border-radius:2px;background:var(--rule)}
-.pip.on{background:var(--cobalt)}
+.pip{width:100%;height:8px;border-radius:0;background:var(--rule)}
+.pip.on{background:var(--accent)}
 .fb-overall{font-size:17px;font-style:italic}
 .fb-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
 .fb-cols ul{margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:15px}
 .upgrade{display:flex;flex-direction:column;gap:6px;font-size:15px}
 .upgrade .before{text-decoration:line-through;text-decoration-color:var(--bad);color:var(--muted)}
-.upgrade .after{background:var(--good-soft);padding:6px 10px;border-radius:6px}
+.upgrade .after{background:var(--good-soft);padding:6px 10px;border-radius:0}
 .wu{display:flex;flex-direction:column;gap:6px;font-size:14.5px}
 .wu div b{font-family:var(--f-display)}
 
@@ -140,29 +163,146 @@ textarea:focus{border-color:var(--cobalt);outline:none}
 .bank div{display:flex;flex-direction:column;gap:2px;padding:8px 0;border-top:1px solid var(--rule)}
 .bank b{font-family:var(--f-display);font-size:17px}
 .bank span{font-size:14px;color:var(--muted);line-height:1.4}
-.empty{color:var(--muted);font-style:italic;font-size:15px}
-.sync{font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.empty{color:var(--muted);font-style:italic;font-size:15px;grid-column:1/-1}
+.sync{font-family:var(--f-mono);font-size:16px;color:var(--muted)}
+
+/* ---------- Views: only one screen is visible at a time ---------- */
+.view{display:flex;flex-direction:column;gap:28px}
+.view[hidden]{display:none}
+.topbar{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.topbar h1{font-size:clamp(26px,6vw,36px);font-weight:700}
+
+/* ---------- Pixel button (home menu + "◀ Home") ----------
+   --frame draws the notched outline; the extra 0 8px shadow is the button's "depth".
+   On press, the face moves down and the depth shrinks, like a real arcade button. */
+.px-btn{display:flex;align-items:center;gap:14px;text-align:left;color:var(--ink);background:var(--face);border:0;border-radius:0;
+  margin:4px 4px 12px;padding:18px 18px;font-family:var(--f-pixel);font-size:19px;font-weight:600;line-height:1.2;
+  box-shadow:var(--frame),0 8px 0 0 var(--edge),inset -4px -4px 0 var(--shade),inset 4px 4px 0 var(--hi);
+  transition:transform .06s steps(1),filter .1s}
+.px-btn:hover{filter:brightness(1.03) saturate(1.1)}
+.px-btn:active{transform:translateY(5px);box-shadow:var(--frame),0 3px 0 0 var(--edge),inset -4px -4px 0 var(--shade),inset 4px 4px 0 var(--hi)}
+.px-btn small{display:block;font-family:var(--f-mono);font-weight:400;font-size:17px;color:var(--muted);margin-top:4px}
+/* The daily challenge is the main action: pinker face plus a darker bar on the right (the red bar in the sketch) */
+.px-btn.primary{background:var(--primary-face);box-shadow:var(--frame),0 8px 0 0 var(--edge),inset -10px -4px 0 var(--primary-shade),inset 4px 4px 0 rgba(255,255,255,.4)}
+.px-btn.primary small{color:var(--ink);opacity:.75}
+.px-btn.small{font-size:15px;padding:8px 14px;margin:3px 3px 9px;gap:8px;box-shadow:var(--frame),0 6px 0 0 var(--edge),inset -3px -3px 0 var(--shade),inset 3px 3px 0 var(--hi)}
+.px-btn.small:active{transform:translateY(4px);box-shadow:var(--frame),0 2px 0 0 var(--edge),inset -3px -3px 0 var(--shade)}
+.ico{flex:none;width:36px;height:36px;display:grid;place-items:center}
+.ico svg,.sprite svg{display:block;width:100%;height:100%;shape-rendering:crispEdges}
+
+/* ---------- Home: pixel title scene ---------- */
+.scene{position:relative;height:clamp(200px,42vw,280px);overflow:hidden;box-shadow:var(--frame);margin:3px;
+  /* Hard color stops = flat horizontal bands, like a 16-color sky */
+  background:linear-gradient(to bottom,var(--sky1) 0 22%,var(--sky2) 22% 42%,var(--sky3) 42% 62%,var(--sky4) 62% 100%)}
+.scene .star{position:absolute;width:4px;height:4px;background:var(--hi);opacity:.9}
+.scene .star.big{width:6px;height:6px}
+@media (prefers-reduced-motion: no-preference){ .scene .star{animation:twinkle 2.4s steps(2) infinite} .scene .star:nth-child(odd){animation-delay:1.2s} }
+@keyframes twinkle{50%{opacity:.25}}
+.sprite{position:absolute}
+.scene .moon{top:9%;left:7%;width:clamp(38px,8vw,56px);height:clamp(38px,8vw,56px)}
+.scene .hill{position:absolute;left:0;bottom:0;width:100%;height:38%}
+.scene .bunny{bottom:16%;right:12%;width:clamp(48px,11vw,72px);height:clamp(40px,9vw,60px)}
+.scene .shroom{bottom:9%;left:9%;width:24px;height:24px}
+.scene .flower{width:16px;height:16px}
+.home-title{position:absolute;inset:0 0 auto;padding-top:clamp(28px,7vw,44px);text-align:center}
+.home-title .welcome{font-family:var(--f-pixel);font-size:clamp(16px,3.6vw,22px);letter-spacing:.3em;color:var(--accent);text-shadow:2px 2px 0 var(--hi)}
+.home-title h1{font-family:var(--f-pixel);font-size:clamp(42px,11vw,76px);font-weight:700;color:var(--ink);letter-spacing:.02em;
+  text-shadow:4px 4px 0 var(--hi),6px 6px 0 var(--shade)}
+.home-title h1 span{color:var(--accent)}
+
+/* ---------- Dialog box (About, facts, quiz questions) ----------
+   Modeled on old RPG text boxes: inner light border, pixel font, blinking ▼ "next" arrow */
+.dialog{position:relative;background:var(--face);margin:3px;padding:22px 22px 26px;
+  box-shadow:var(--frame),inset 0 0 0 3px var(--hi),inset 0 0 0 6px var(--shade);
+  font-family:var(--f-pixel);font-size:clamp(17px,3.6vw,21px);line-height:1.55;color:var(--ink);cursor:pointer}
+.dialog p{min-height:3.1em}
+.dialog-name{position:absolute;top:-16px;left:14px;background:var(--edge);color:#FFF6FA;font-family:var(--f-pixel);font-size:15px;padding:2px 10px;letter-spacing:.05em}
+.dialog-next{position:absolute;right:16px;bottom:8px;color:var(--accent);font-size:16px}
+@media (prefers-reduced-motion: no-preference){ .dialog-next{animation:blink 1s steps(2) infinite} }
+@keyframes blink{50%{opacity:0}}
+.dialog.typing .dialog-next{visibility:hidden}
+.home-dialog{margin-top:-6px}
+
+/* ---------- Home menu: 2×2 grid of big pixel buttons (one column on phones) ---------- */
+.menu{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px 22px}
+.home-stats{text-align:center;font-family:var(--f-mono);font-size:19px;color:var(--muted)}
+
+/* ---------- Random facts ---------- */
+.fact-word{color:var(--accent)}
+.fact-row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.fact-count{font-family:var(--f-mono);font-size:19px;color:var(--muted)}
+
+/* ---------- Quiz ---------- */
+.quiz-hud{display:flex;justify-content:space-between;align-items:center;gap:12px;font-family:var(--f-mono);font-size:20px}
+.hearts{display:flex;gap:4px}.hearts .ico{width:22px;height:22px}
+.hearts .lost{opacity:.2;filter:grayscale(1)}
+.bar{height:14px;background:var(--paper);box-shadow:var(--frame);margin:3px}
+.bar i{display:block;height:100%;background:var(--accent);transition:width .25s steps(4)}
+.quiz-end{text-align:center;display:flex;flex-direction:column;gap:12px;align-items:center}
+.quiz-end .big{font-family:var(--f-pixel);font-size:56px;font-weight:700;color:var(--accent);line-height:1}
+.rank{font-family:var(--f-pixel);font-size:24px}
+
+/* ---------- Scores / history ---------- */
+.runs{display:flex;flex-direction:column}
+.run{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-top:2px dotted var(--rule);font-family:var(--f-mono);font-size:19px}
+.run:first-child{border-top:0}
+.run b{font-family:var(--f-pixel);color:var(--accent)}
+
 @media (prefers-reduced-motion: no-preference){ .reveal,.feedback{animation:rise .35s ease both} @keyframes rise{from{transform:translateY(6px)}to{transform:none}} }
 </style>
 </head>
 <body>
 
 <div class="wrap">
-  <header class="mast">
+
+  <!-- ===================== HOME ===================== -->
+  <!-- Title scene + About dialog + main menu (layout from the hand-drawn sketch) -->
+  <main class="view" data-view="home">
+    <div class="scene" id="scene">
+      <!-- stars, moon, hill, bunny and flowers are drawn by drawScene() -->
+      <div class="home-title"><p class="welcome">WELCOME!</p><h1>Word<span>Smith</span></h1></div>
+    </div>
+
+    <section class="dialog home-dialog" id="aboutBox" aria-label="About WordSmith">
+      <span class="dialog-name">About</span>
+      <p id="aboutText"></p>
+      <span class="dialog-next" aria-hidden="true">&#9660;</span>
+    </section>
+
+    <nav class="menu" aria-label="Main menu">
+      <button class="px-btn primary" type="button" data-go="challenge">
+        <span class="ico" data-sprite="heart"></span>
+        <span>Begin Daily Challenge<small id="dailyStatus">4 quick stations</small></span>
+      </button>
+      <button class="px-btn" type="button" data-go="facts">
+        <span class="ico" data-sprite="star"></span>
+        <span>Random Facts<small>Fun word trivia</small></span>
+      </button>
+      <button class="px-btn" type="button" data-go="history">
+        <span class="ico" data-sprite="trophy"></span>
+        <span>Scores / History<small>Streaks, XP &amp; past work</small></span>
+      </button>
+      <button class="px-btn" type="button" data-go="quiz">
+        <span class="ico" data-sprite="qblock"></span>
+        <span>Test your Knowledge<small>10-question quiz</small></span>
+      </button>
+    </nav>
+    <p class="home-stats" id="homeStats"></p>
+  </main>
+
+  <!-- ===================== DAILY CHALLENGE ===================== -->
+  <!-- The original four stations, unchanged in behavior -->
+  <main class="view" data-view="challenge" hidden>
+    <header class="topbar">
+      <button class="px-btn small" type="button" data-go="home">&#9664; Home</button>
+      <h1>Daily Challenge</h1>
+    </header>
     <div class="mast-top">
-      <h1>Daily <em>Wordsmith</em></h1>
+      <p class="entry-line" id="entryLine"></p>
       <span class="sync" id="sync">Saved on this device</span>
     </div>
-    <p class="entry-line" id="entryLine"></p>
-    <div class="stats">
-      <div class="stat"><b id="sStreak">0</b><span class="label">day streak</span></div>
-      <div class="stat"><b id="sXP">0</b><span class="label">XP</span></div>
-      <div class="stat"><b id="sWords">0</b><span class="label">words learned</span></div>
-      <div class="week" id="week" aria-label="Last 7 days"></div>
-    </div>
-  </header>
 
-  <nav class="steps" id="steps" aria-label="Today's activities"></nav>
+    <nav class="steps" id="steps" aria-label="Today's activities"></nav>
 
   <section class="station" id="learn">
     <div class="st-head"><span class="label">Station 1 · Learn</span><h2>Today's three words</h2>
@@ -201,7 +341,54 @@ textarea:focus{border-color:var(--cobalt);outline:none}
     <div id="fbBox"></div>
   </section>
 
-  <div class="lower">
+  </main>
+
+  <!-- ===================== RANDOM FACTS ===================== -->
+  <main class="view" data-view="facts" hidden>
+    <header class="topbar">
+      <button class="px-btn small" type="button" data-go="home">&#9664; Home</button>
+      <h1>Random Facts</h1>
+    </header>
+    <section class="dialog" id="factBox" aria-live="polite">
+      <span class="dialog-name">Did you know?</span>
+      <p id="factText"></p>
+      <span class="dialog-next" aria-hidden="true">&#9660;</span>
+    </section>
+    <div class="fact-row">
+      <span class="fact-count" id="factCount"></span>
+      <button class="btn" type="button" id="nextFact">Another fact &#9654;</button>
+    </div>
+  </main>
+
+  <!-- ===================== TEST YOUR KNOWLEDGE ===================== -->
+  <main class="view" data-view="quiz" hidden>
+    <header class="topbar">
+      <button class="px-btn small" type="button" data-go="home">&#9664; Home</button>
+      <h1>Test your Knowledge</h1>
+    </header>
+    <section class="station" id="quizBox"></section>
+  </main>
+
+  <!-- ===================== SCORES / HISTORY ===================== -->
+  <main class="view" data-view="history" hidden>
+    <header class="topbar">
+      <button class="px-btn small" type="button" data-go="home">&#9664; Home</button>
+      <h1>Scores / History</h1>
+    </header>
+    <section class="station">
+      <div class="st-head"><span class="label">Player stats</span><h2>Your progress</h2></div>
+      <div class="stats">
+        <div class="stat"><b id="sStreak">0</b><span class="label">day streak</span></div>
+        <div class="stat"><b id="sXP">0</b><span class="label">XP</span></div>
+        <div class="stat"><b id="sWords">0</b><span class="label">words learned</span></div>
+        <div class="stat"><b id="sBest">&ndash;</b><span class="label">best quiz</span></div>
+      </div>
+      <div class="week" id="week" aria-label="Last 7 days"></div>
+    </section>
+    <section class="station">
+      <div class="st-head"><span class="label">High scores</span><h2>Quiz runs</h2></div>
+      <div class="runs" id="runs"></div>
+    </section>
     <section class="station" id="bankSec">
       <div class="st-head"><span class="label">Word bank</span><h2>Words you've learned</h2></div>
       <div class="bank" id="bank"></div>
@@ -210,7 +397,7 @@ textarea:focus{border-color:var(--cobalt);outline:none}
       <div class="st-head"><span class="label">Journal</span><h2>Past paragraphs</h2></div>
       <div id="journal"></div>
     </section>
-  </div>
+  </main>
 </div>
 
 <script>
@@ -348,6 +535,8 @@ const LS="daily-wordsmith-v1";
 let S={v:1,days:{}};
 try{const raw=localStorage.getItem(LS);if(raw)S=JSON.parse(raw)||S;}catch(e){}
 if(!S.days)S.days={};
+if(!S.quiz||!Array.isArray(S.quiz.runs))S.quiz={runs:[]}; // Test-your-Knowledge results: {d:dateKey, s:score, n:questions}
+if(!Array.isArray(S.facts))S.facts=[];               // indexes of Random Facts already seen
 let dbRef=null, saveT=null;
 function day(k=TODAY){if(!S.days[k])S.days[k]={learn:{},recall:{},reason:null,write:{text:"",promptShift:0}};return S.days[k];}
 function save(){
@@ -386,6 +575,11 @@ function renderHeader(){
     const el=document.createElement("span");el.className="dot"+(S.days[k]&&S.days[k].write&&S.days[k].write.done?" done":"")+(i===0?" today":"");
     el.textContent=d.toLocaleDateString(undefined,{weekday:"narrow"});el.title=d.toLocaleDateString();wk.appendChild(el);}
   const steps=[["learn","Learn"],["recall","Recall"],["reason","Reason"],["write","Write"]];
+  // Home screen: one-line summary + how far today's challenge is
+  const doneCount=steps.filter(([id])=>stepDone[id]()).length;
+  document.getElementById("dailyStatus").textContent=doneCount===4?"Done for today ✓":doneCount?doneCount+"/4 stations done":"4 quick stations";
+  document.getElementById("homeStats").textContent="★ "+streak()+"-day streak  ·  "+xpTotal()+" XP  ·  "+learned().length+" words";
+  renderScores();
   document.getElementById("steps").innerHTML=steps.map(([id,l],i)=>`<a href="#${id}" class="${stepDone[id]()?"done":""}"><span class="n">${stepDone[id]()?"✓":i+1}</span>${l}</a>`).join("");
 }
 
@@ -562,10 +756,199 @@ document.addEventListener("click",e=>{
   else if(b.dataset.reason!==undefined){d.reason=Number(b.dataset.reason);save();renderAll(false);}
   else if(b.id==="nextPrompt"){d.write.promptShift=(d.write.promptShift||0)+1;save();renderWriteStatic();}
   else if(b.id==="submitBtn"){submitWriting();}
+  else if(b.dataset.go){go(b.dataset.go);}
+  else if(b.id==="nextFact"){showFact();}
+  else if(b.dataset.quiz!==undefined){answerQuiz(b.dataset.quiz);}
+  else if(b.id==="quizNext"){Q.i++;Q.ans=null;renderQuiz();}
+  else if(b.id==="quizAgain"){startQuiz();}
 });
 document.getElementById("essay").addEventListener("input",e=>{day().write.text=e.target.value;save();renderWriteLive();});
 
+/* =====================================================================
+   Pixel art: tiny sprites drawn from text grids.
+   Each character is one "pixel"; "." is transparent. Rendered as SVG
+   rects with crispEdges so they stay sharp at any size.
+   ===================================================================== */
+const PAL={o:"var(--edge)",w:"#FFFDF8",p:"#F4A3BF",r:"#E0587E",y:"var(--moon)",g:"#F2C14E",b:"#B98A5E",n:"#9CC98F"};
+const SPRITES={
+  heart:[".rr.rr.","rrprrrr","rprrrrr","rrrrrrr",".rrrrr.","..rrr..","...r..."],
+  star:["...g...","...g...","..ggg..","ggggggg",".ggggg.","..ggg..",".gg.gg.","gg...gg"],
+  trophy:["ggggggg","goggggo","g.ggg.g",".ggggg.","..ggg..","...g...","..ggg..",".bbbbb."],
+  // "?" block, like the ones in old platformer games
+  qblock:["ooooooooo","ogggggggo","oggoooggo","ogogggogo","oggggoggo","ogggogggo","ogggggggo","ogggogggo","ooooooooo"],
+  moon:["..yyyy..",".yyy....","yyy.....","yy......","yy......","yyy.....",".yyy....","..yyyy.."],
+  bunny:["..oo....oo..",".owpo..opwo.",".owpo..opwo.",".owwoooowwo.","owwwwwwwwwwo","owwowwwwowwo","owpwwwwwwpwo","owwwwrrwwwwo",".owwwwwwwwo.","..oooooooo.."],
+  shroom:["..rrrr..",".rwrrwr.","rrrrrrrr","rwrrrrwr","..wwww..","..wwww..","..wwww.."],
+  flower:[".p.p.",".ppp.","ppgpp",".ppp.","..n..","..n.."]
+};
+function sprite(name){
+  const g=SPRITES[name];const h=g.length,w=Math.max(...g.map(r=>r.length));let rects="";
+  g.forEach((row,y)=>[...row].forEach((c,x)=>{if(PAL[c])rects+=`<rect x="${x}" y="${y}" width="1.02" height="1.02" fill="${PAL[c]}"/>`;}));
+  return `<svg viewBox="0 0 ${w} ${h}" aria-hidden="true">${rects}</svg>`;
+}
+function fillSprites(root=document){root.querySelectorAll("[data-sprite]").forEach(el=>{if(!el.firstChild)el.innerHTML=sprite(el.dataset.sprite);});}
+
+/* Title scene: twinkling stars, crescent moon, a stepped pixel hill, the bunny and a few flowers */
+function drawScene(){
+  const sc=document.getElementById("scene");const r=rng(7);let html="";
+  for(let i=0;i<16;i++)html+=`<span class="star${i%5===0?" big":""}" aria-hidden="true" style="left:${Math.floor(r()*96)+2}%;top:${Math.floor(r()*50)+3}%"></span>`;
+  // Hill: 8-unit-wide columns whose heights follow a gentle wave, so the top edge looks stepped
+  let cols="";for(let x=0;x<320;x+=8){const h=Math.round((26+10*Math.sin(x/38)+5*Math.sin(x/13))/4)*4;
+    cols+=`<rect x="${x}" y="${60-h}" width="8" height="${h}" fill="var(--hill)"/><rect x="${x}" y="${60-h}" width="8" height="3" fill="var(--hill-dark)"/>`;}
+  html+=`<svg class="hill" viewBox="0 0 320 60" preserveAspectRatio="none" aria-hidden="true" style="shape-rendering:crispEdges">${cols}</svg>`;
+  html+=`<span class="sprite moon" data-sprite="moon"></span><span class="sprite bunny" data-sprite="bunny"></span><span class="sprite shroom" data-sprite="shroom"></span>`;
+  [[22,6],[38,12],[60,5],[74,10]].forEach(([l,b])=>html+=`<span class="sprite flower" data-sprite="flower" style="left:${l}%;bottom:${b}%"></span>`);
+  sc.insertAdjacentHTML("afterbegin",html);fillSprites(sc);
+}
+
+/* =====================================================================
+   Typewriter dialog: prints text a letter at a time like an old game.
+   Click the box to skip to the end. Instant for reduced-motion users.
+   ===================================================================== */
+const REDUCED=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+const typers=new WeakMap();
+function typeInto(el,html){
+  const box=el.closest(".dialog");const prev=typers.get(el);if(prev)clearInterval(prev.t);
+  const finish=()=>{const cur=typers.get(el);if(cur)clearInterval(cur.t);typers.delete(el);el.innerHTML=html;box&&box.classList.remove("typing");};
+  if(REDUCED){finish();return;}
+  // Type the plain text, then swap in the full HTML (keeps <b> highlights) once done
+  const tmp=document.createElement("div");tmp.innerHTML=html;const text=tmp.textContent;let i=0;
+  box&&box.classList.add("typing");el.textContent="";
+  const t=setInterval(()=>{i+=2;el.textContent=text.slice(0,i);if(i>=text.length)finish();},22);
+  typers.set(el,{t,finish});
+}
+document.addEventListener("click",e=>{const box=e.target.closest(".dialog");if(!box)return;const p=box.querySelector("p");const cur=typers.get(p);if(cur)cur.finish();});
+
+const ABOUT="<b>WordSmith</b> is an interactive game that will help you improve your language abilities and your vocabulary. Pick a button below to begin!";
+
+/* =====================================================================
+   Screens: home / challenge / facts / quiz / history.
+   The current screen is kept in the URL hash so refresh stays put.
+   ===================================================================== */
+const VIEWS=["home","challenge","facts","quiz","history"];
+function go(v){
+  if(!VIEWS.includes(v))v="home";
+  document.querySelectorAll(".view").forEach(el=>{el.hidden=el.dataset.view!==v;});
+  window.scrollTo(0,0);
+  if(v==="home")typeInto(document.getElementById("aboutText"),ABOUT);
+  if(v==="facts")showFact();
+  if(v==="quiz"&&(!Q||Q.i>=Q.qs.length))startQuiz();
+  if(v==="history")renderScores();
+  try{history.replaceState(null,"","#"+v);}catch(e){}
+  const focusEl=document.querySelector(`.view[data-view="${v}"] h1`);if(focusEl&&v!=="home"){focusEl.tabIndex=-1;focusEl.focus({preventScroll:true});}
+}
+
+/* =====================================================================
+   Random Facts: short word & language trivia shown in the dialog box.
+   ===================================================================== */
+const FACTS=[
+  "The word <b>nice</b> once meant \"foolish\" or \"ignorant\". It comes from the Latin <i>nescius</i>, \"not knowing\".",
+  "<b>Silly</b> started out meaning \"happy\" or \"blessed\" in Old English.",
+  "<b>Muscle</b> comes from the Latin <i>musculus</i>, \"little mouse\", maybe because a flexing muscle looks like a mouse moving under the skin.",
+  "<b>Goodbye</b> is a shortened form of \"God be with ye\".",
+  "<b>Robot</b> comes from the Czech word <i>robota</i>, \"forced labor\". It first appeared in Karel Čapek's 1920 play <i>R.U.R.</i>",
+  "<b>Alphabet</b> is made from the first two Greek letters: <i>alpha</i> and <i>beta</i>.",
+  "<b>Disaster</b> literally means \"bad star\". People once blamed bad luck on the position of the planets.",
+  "<b>Quarantine</b> comes from the Italian <i>quaranta giorni</i>, \"forty days\", the time ships had to wait before landing during plague outbreaks.",
+  "A <b>clue</b> was originally a \"clew\", a ball of thread, like the one Theseus used to find his way out of the labyrinth.",
+  "<b>Window</b> comes from the Old Norse <i>vindauga</i>: \"wind eye\".",
+  "<b>Daisy</b> comes from \"day's eye\", because the flower opens in the morning and closes at night.",
+  "<b>Emoji</b> has nothing to do with \"emotion\". It's Japanese: <i>e</i> (picture) + <i>moji</i> (character).",
+  "<b>Oxymoron</b> is itself an oxymoron: it joins the Greek <i>oxys</i> (sharp) and <i>moros</i> (dull).",
+  "<b>Avocado</b> comes from <i>ahuacatl</i>, a word in Nahuatl, the language of the Aztecs.",
+  "<b>Typewriter</b> can be typed using only the top row of letters on a standard keyboard.",
+  "<b>Bookkeeper</b> has three double letters in a row: oo, kk, ee.",
+  "<b>Uncopyrightable</b> is one of the longest English words that doesn't repeat a single letter.",
+  "<b>Strengths</b> has nine letters but only one vowel.",
+  "\"The quick brown fox jumps over the lazy dog\" is a <b>pangram</b>: a sentence that uses every letter of the alphabet.",
+  "A <b>palindrome</b> reads the same backwards and forwards, like \"level\", \"racecar\", or \"Was it a car or a cat I saw?\"",
+  "The verb <b>run</b> has more than 600 senses in the Oxford English Dictionary, one of the most of any English word.",
+  "Shakespeare's plays contain the earliest recorded uses of many English words, including <b>eyeball</b> and <b>bedroom</b>.",
+  "Researchers estimate that most adult native English speakers know somewhere around <b>20,000 to 35,000</b> words.",
+  "Reviewing a new word again after a few days (called <b>spaced repetition</b>) helps you remember it far longer than cramming. That's why the Recall station brings old words back!",
+  "<b>Ketchup</b> probably comes from a Hokkien Chinese word for a fermented fish sauce."
+];
+let factIdx=-1;
+function showFact(){
+  // Prefer facts you haven't seen yet; once all are seen, pick any (but not the same one twice in a row)
+  const unseen=FACTS.map((_,i)=>i).filter(i=>!S.facts.includes(i)&&i!==factIdx);
+  const pool=unseen.length?unseen:FACTS.map((_,i)=>i).filter(i=>i!==factIdx);
+  factIdx=pool[Math.floor(Math.random()*pool.length)];
+  if(!S.facts.includes(factIdx)){S.facts.push(factIdx);save();}
+  typeInto(document.getElementById("factText"),FACTS[factIdx]);
+  document.getElementById("factCount").textContent="Discovered "+S.facts.length+" / "+FACTS.length+" facts";
+}
+
+/* =====================================================================
+   Test your Knowledge: a 10-question quiz with 3 hearts.
+   Words you've already learned come first; the rest of the list fills in,
+   so it's playable from day one. Questions alternate between
+   "which word means…" and "what does … mean?". Losing all hearts ends the run.
+   ===================================================================== */
+const QN=10, LIVES=3;
+let Q=null;
+function startQuiz(){
+  const r=rng(Date.now()>>>0);const L=learned();
+  const pool=shuffle(L.map(w=>BY[w]),r).concat(shuffle(W.filter(x=>!L.includes(x.w)),r)).slice(0,QN);
+  const qs=pool.map((w,i)=>{
+    const others=shuffle(W.filter(x=>x.w!==w.w&&x.pos===w.pos),r).slice(0,3);
+    const askWord=i%2===0; // even: show the definition, pick the word
+    const opts=shuffle([w,...others],r).map(x=>askWord?x.w:x.def);
+    return {w,askWord,opts,correct:askWord?w.w:w.def};
+  });
+  Q={qs,i:0,score:0,lives:LIVES,ans:null,saved:false};
+  renderQuiz();
+}
+function answerQuiz(v){
+  if(!Q||Q.ans!==null)return;const q=Q.qs[Q.i];Q.ans=v;
+  if(v===q.correct)Q.score++;else Q.lives--;
+  renderQuiz();
+}
+function quizRank(s,n){const f=s/n;return f===1?"Word Wizard":f>=.8?"Wordsmith":f>=.5?"Apprentice":"Novice";}
+function renderQuiz(){
+  const box=document.getElementById("quizBox");
+  const over=Q.i>=Q.qs.length||Q.lives<=0;
+  if(over){
+    // Save each finished run once
+    if(!Q.saved){Q.saved=true;Q.prevBest=S.quiz.runs.length?Math.max(...S.quiz.runs.map(r=>r.s)):0;S.quiz.runs.push({d:TODAY,s:Q.score,n:QN});save();renderHeader();}
+    const best=Math.max(...S.quiz.runs.map(r=>r.s));
+    box.innerHTML=`<div class="quiz-end"><span class="label">${Q.lives<=0?"Game over":"Quiz complete"}</span>
+      <span class="ico" data-sprite="${Q.score>=8?"trophy":"star"}" style="width:56px;height:56px"></span>
+      <span class="big">${Q.score}/${QN}</span><span class="rank">Rank: ${quizRank(Q.score,QN)}</span>
+      <p class="note">${Q.score>Q.prevBest?"New personal best!":"Best so far: "+best+"/"+QN}</p>
+      <div class="actions" style="justify-content:center"><button class="btn" id="quizAgain" type="button">Play again</button>
+      <button class="btn ghost" type="button" data-go="history">See scores</button></div></div>`;
+    fillSprites(box);return;
+  }
+  const q=Q.qs[Q.i];const done=Q.ans!==null;
+  const hearts=Array.from({length:LIVES},(_,i)=>`<span class="ico${i>=Q.lives?" lost":""}" data-sprite="heart"></span>`).join("");
+  const opts=q.opts.map(o=>{let c="opt";if(done){if(o===q.correct)c+=" right";else if(o===Q.ans)c+=" wrong";else c+=" dim";}
+    return `<button class="${c}" type="button" data-quiz="${esc(o)}" ${done?"disabled":""}>${esc(o)}</button>`;}).join("");
+  const question=q.askWord?`Which word means: <b>${esc(q.w.def)}</b>`:`What does <b class="fact-word">${esc(q.w.w)}</b> mean?`;
+  const last=Q.i===Q.qs.length-1||(done&&Q.lives<=0);
+  box.innerHTML=`<div class="quiz-hud"><span>Q ${Q.i+1}/${QN}</span><span>Score ${Q.score}</span><span class="hearts" aria-label="${Q.lives} hearts left">${hearts}</span></div>
+    <div class="bar" aria-hidden="true"><i style="width:${(Q.i+(done?1:0))/QN*100}%"></i></div>
+    <div class="dialog" style="cursor:default"><span class="dialog-name">Question</span><p>${question}</p></div>
+    <div class="opts">${opts}</div>
+    ${done?`<div class="reveal"><span class="verdict ${Q.ans===q.correct?"g":"b"}">${Q.ans===q.correct?"CORRECT!":"NOT QUITE · -1 HEART"}</span>
+      <p class="def"><b>${esc(q.w.w)}</b> (${esc(q.w.pos)}): ${esc(q.w.def)}</p><p class="ex">“${esc(q.w.ex)}”</p></div>
+      <div class="actions"><button class="btn" id="quizNext" type="button">${last?"See results":"Next"} &#9654;</button></div>`:""}`;
+  fillSprites(box);
+  if(done){const n=document.getElementById("quizNext");n&&n.focus({preventScroll:true});}
+}
+
+/* Scores / History: best quiz score and the 10 most recent runs */
+function renderScores(){
+  const runs=S.quiz.runs;
+  document.getElementById("sBest").textContent=runs.length?Math.max(...runs.map(r=>r.s))+"/"+QN:"–";
+  document.getElementById("runs").innerHTML=runs.length?runs.slice(-10).reverse().map(r=>
+    `<div class="run"><span>${esc(fromKey(r.d).toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"}))}</span><span>${esc(quizRank(r.s,r.n))}</span><b>${r.s}/${r.n}</b></div>`).join(""):
+    '<p class="empty">No quiz runs yet. Try "Test your Knowledge" from the home screen.</p>';
+}
+
+drawScene();fillSprites();
 renderAll();
+go(location.hash.slice(1)); // open the screen named in the URL, or the home screen
 
 /* ---------- Capabilities: account sync + AI feedback ---------- */
 (async()=>{
@@ -585,6 +968,7 @@ renderAll();
           if(loc.reason==null&&r.reason!=null)loc.reason=r.reason;
           if(r.write&&r.write.done&&!(loc.write&&loc.write.done))loc.write=JSON.parse(JSON.stringify(r.write));}}
     }
+    if(snap.exists){const rq=(snap.data()||{}).quiz;if(rq&&Array.isArray(rq.runs)&&rq.runs.length>S.quiz.runs.length)S.quiz=rq;}
     setSync("Synced to your account");save();renderAll();
   }catch(e){}
 })();
