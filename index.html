@@ -38,7 +38,10 @@ body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-siz
 h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.15}
 p{margin:0}
 .label{font-family:var(--f-mono);font-size:17px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
-button{font:inherit;cursor:pointer}
+/* Buttons show a tiny pixel bunny as the mouse cursor. --bunny-cursor is filled in by setBunnyCursor() in the script;
+   until then (or if the browser can't use it) the normal hand pointer shows. */
+button{font:inherit;cursor:var(--bunny-cursor,pointer)}
+button:disabled{cursor:not-allowed}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
 /* Header */
@@ -80,6 +83,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .opts{display:grid;gap:8px}
 .opt{text-align:left;background:var(--paper);color:var(--ink);border:2px solid var(--rule);border-radius:0;box-shadow:inset -3px -3px 0 var(--accent-soft);padding:10px 14px;font-family:var(--f-body);font-size:15px;line-height:1.45}
 .opt:hover:not(:disabled){border-color:var(--edge);background:var(--face)}
+.opt:active:not(:disabled){transform:translateY(2px)}
 .opt:disabled{cursor:default}
 .opt.right{border-color:var(--good);background:var(--good-soft)}
 .opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
@@ -253,11 +257,37 @@ textarea:focus{border-color:var(--accent);outline:none}
   #cardPrev{justify-self:start} #cardNext{justify-self:end}
 }
 
+/* ---------- Click effect: a little burst of pixel hearts/sparkles where you clicked ---------- */
+.burst{position:fixed;width:6px;height:6px;pointer-events:none;z-index:50;background:var(--accent);
+  animation:burst .45s steps(5) forwards}
+.burst.h{background:none;width:10px;height:9px}
+.burst.h svg{width:100%;height:100%;display:block;shape-rendering:crispEdges}
+@keyframes burst{from{transform:translate(-50%,-50%) scale(1);opacity:1}to{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(.6);opacity:0}}
+/* clicked buttons also flash brighter for a moment */
+.flash{animation:flash .18s steps(2)}
+@keyframes flash{50%{filter:brightness(1.15) saturate(1.2)}}
+
+/* Hearts score box: heart icon + count */
+.score-box .ico{width:24px;height:24px}
+
 /* ---------- Scores / history ---------- */
 .runs{display:flex;flex-direction:column}
 .run{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-top:2px dotted var(--rule);font-family:var(--f-mono);font-size:19px}
 .run:first-child{border-top:0}
 .run b{font-family:var(--f-pixel);color:var(--accent)}
+/* Skill bars (option B): % correct per skill, weakest one marked "Needs improvement" */
+.skills{display:flex;flex-direction:column;gap:14px}
+.skill{display:grid;grid-template-columns:minmax(120px,190px) minmax(0,1fr) 52px;align-items:center;gap:12px}
+.skill-name{font-family:var(--f-mono);font-size:19px;line-height:1.1}
+.skill-name small{display:block;font-size:16px;color:var(--muted)}
+.skill-track{height:20px;background:#F7DCE7}
+.skill-fill{height:100%;background:#2A86C4;transition:width .3s steps(6)}
+.skill.weak .skill-fill{background:#D9548C}
+.skill.weak .skill-name{color:#B83A6E}
+.skill-pct{font-family:var(--f-mono);font-size:20px;font-variant-numeric:tabular-nums}
+.skill.none .skill-pct{color:var(--muted)}
+.callout{font-family:var(--f-mono);font-size:19px;background:var(--face);padding:6px 12px;border-left:4px solid #D9548C}
+@media (max-width:480px){.skill{grid-template-columns:1fr 52px}.skill-track{grid-column:1/-1;grid-row:2}}
 
 @media (prefers-reduced-motion: no-preference){ .reveal,.feedback{animation:rise .35s ease both} @keyframes rise{from{transform:translateY(6px)}to{transform:none}} }
 </style>
@@ -295,7 +325,7 @@ textarea:focus{border-color:var(--accent);outline:none}
       </button>
       <button class="px-btn" type="button" data-go="history">
         <span class="ico" data-sprite="trophy"></span>
-        <span>Scores / History<small>Streaks, XP &amp; past work</small></span>
+        <span>Scores / History<small>Skills, hearts &amp; past work</small></span>
       </button>
       <button class="px-btn" type="button" data-go="quiz">
         <span class="ico" data-sprite="qblock"></span>
@@ -314,10 +344,7 @@ textarea:focus{border-color:var(--accent);outline:none}
       <h1>Daily Challenge</h1>
     </header>
     <span class="theme-tag" id="theme">Theme</span>
-    <div class="mast-top">
-      <p class="entry-line" id="entryLine"></p>
-      <span class="sync" id="sync">Saved on this device</span>
-    </div>
+    <span class="sync" id="sync" hidden>Saved on this device</span>
 
     <p class="sec-name"><span id="secName">Learn</span><small id="cardCount"></small></p>
     <nav class="steps" id="steps" aria-label="Today's cards"></nav>
@@ -366,7 +393,7 @@ textarea:focus{border-color:var(--accent);outline:none}
     <button class="px-btn small arrow" type="button" id="cardNext" aria-label="Next">&#9654;</button>
     </div>
 
-    <div class="score-box" aria-live="polite">Score <b id="dayScore">0 XP</b></div>
+    <div class="score-box" aria-live="polite">Hearts <span class="ico" data-sprite="heart" aria-hidden="true"></span><b id="dayScore">× 0</b></div>
   </main>
 
   <!-- ===================== RANDOM FACTS ===================== -->
@@ -410,10 +437,16 @@ textarea:focus{border-color:var(--accent);outline:none}
       <h1>Scores / History</h1>
     </header>
     <section class="station">
+      <div class="st-head"><span class="label">Skills</span><h2>How you're doing</h2>
+        <p>The % of answers you got right in each part of the game.</p></div>
+      <div class="skills" id="skills"></div>
+      <p class="callout" id="skillTip" hidden></p>
+    </section>
+    <section class="station">
       <div class="st-head"><span class="label">Player stats</span><h2>Your progress</h2></div>
       <div class="stats">
         <div class="stat"><b id="sStreak">0</b><span class="label">day streak</span></div>
-        <div class="stat"><b id="sXP">0</b><span class="label">XP</span></div>
+        <div class="stat"><b id="sXP">0</b><span class="label">hearts</span></div>
         <div class="stat"><b id="sWords">0</b><span class="label">words learned</span></div>
         <div class="stat"><b id="sBest">&ndash;</b><span class="label">best quiz</span></div>
       </div>
@@ -516,29 +549,27 @@ const P = [
 ["Writing logic","\"The plan was cheap. ___, it took twice as long as expected.\" Which transition fits best?",["However","Therefore","For example","Similarly"],0,"The second sentence contrasts with the first (cheap but slow), so you need a contrast word like 'However'."],
 ["Evidence","Which detail would most strengthen a paragraph arguing that public libraries still matter?",["Library visits in the city rose 12% last year.","The writer's favorite book is a mystery.","Libraries have existed for a long time.","Everyone agrees libraries are nice."],0,"A specific, checkable figure supports the claim far better than opinions or vague statements."]
 ];
-const PROMPTS = [
-["Describe","Describe a place you went to as a child so clearly that a reader could walk through it."],
-["Argue","Should schools start later in the morning? Take a side and defend it."],
-["Narrate","Write about a time you changed your mind about something important."],
-["Explain","Explain how to do something you're good at to someone who has never tried it."],
-["Imagine","You wake up and every clock in the world has stopped. What happens next?"],
-["Reflect","What small habit makes your day better, and why does it work?"],
-["Argue","Is it better to be a specialist or a generalist? Pick one and make your case."],
-["Describe","Describe the sounds and smells of a rainy evening in a city."],
-["Compare","Compare learning from a book with learning from a video. Which sticks better for you?"],
-["Narrate","Tell the story of an ordinary object in your room from the object's point of view."],
-["Persuade","Convince a friend to try a food they've always refused."],
-["Reflect","What advice would you give yourself from five years ago?"],
-["Argue","Should people be allowed to bring pets to work?"],
-["Explain","Explain why a tradition in your family or culture matters."],
-["Imagine","Invent a new holiday and explain how people celebrate it."],
-["Describe","Describe a person you admire using only their actions, not adjectives about them."],
-["Argue","Do smartphones make us more connected or more isolated?"],
-["Narrate","Write about the first five minutes after receiving surprising news."],
-["Reflect","What is something you were bad at and got better at? How did it happen?"],
-["Compare","City life or small-town life: which would you choose for the next ten years, and why?"],
-["Explain","Explain a problem in your neighborhood and one practical way to fix it."]
+/* Daily themes: each day gets one at random (the player doesn't choose). The theme sets the writing prompt;
+   "Try a different prompt" cycles through that theme's prompts. */
+const THEMES = [
+["Animals",[["Describe","Describe an animal you've watched closely. How does it move, sound, and behave?"],["Argue","Should zoos still exist? Take a side and defend it."],["Imagine","You can understand one kind of animal for a day. Which one, and what do you learn?"]]],
+["Family",[["Narrate","Tell the story of a family tradition and how it started (or how you imagine it started)."],["Reflect","What is something a family member taught you without meaning to?"],["Compare","Big family or small family: which shapes a person more, and how?"]]],
+["Culture",[["Explain","Explain a custom from your culture to someone who has never heard of it."],["Reflect","Which part of another culture would you most like to understand, and why?"],["Argue","Is it important to keep old traditions, even when the world changes? Defend your view."]]],
+["Religion & beliefs",[["Explain","Describe a celebration or ritual from a religion or belief you know. What does it mean to the people who take part?"],["Reflect","Why do you think so many people find meaning in faith or shared beliefs?"],["Argue","Should schools teach about the world's major religions? Give your reasons."]]],
+["Food",[["Describe","Describe a meal you'll never forget: the smells, the taste, and who was there."],["Persuade","Convince a friend to try a food they've always refused."],["Explain","Explain how to cook a dish you love to someone who has never cooked."]]],
+["Nature",[["Describe","Describe the sounds and smells of a rainy evening."],["Argue","Should cities give more space to parks, even if it means fewer buildings?"],["Reflect","Where in nature do you feel most calm, and why?"]]],
+["Travel",[["Narrate","Write about a trip that didn't go as planned."],["Imagine","You can visit any place in the world tomorrow. Where do you go, and what do you do first?"],["Compare","Traveling alone or with friends: which teaches you more?"]]],
+["Friendship",[["Narrate","Tell how you met one of your closest friends."],["Reflect","What makes someone a good friend? Use one real example."],["Argue","Can you be real friends with someone you've only met online?"]]],
+["Music & art",[["Describe","Describe a song that changes your mood, without naming the song."],["Argue","Should art and music classes be required in every school?"],["Explain","Explain why a painting, photo, or song you love means something to you."]]],
+["Childhood",[["Describe","Describe a place you went to as a child so clearly that a reader could walk through it."],["Reflect","What advice would you give yourself from five years ago?"],["Narrate","Write about a game you loved as a kid and why it mattered."]]],
+["Technology",[["Argue","Do smartphones make us more connected or more isolated?"],["Imagine","Invent a gadget that would make your day easier. How does it work?"],["Reflect","What is one piece of technology you could never give up, and why?"]]],
+["Sports & games",[["Narrate","Write about a time you won, or lost, something that mattered to you."],["Argue","Are video games a sport? Take a side."],["Explain","Explain the rules of a game you love to someone who has never played."]]],
+["Dreams & goals",[["Reflect","What is one goal you have for this year, and what's your first step?"],["Imagine","Describe your life ten years from now on a perfect ordinary day."],["Narrate","Write about a time you kept going even though you wanted to quit."]]]
 ];
+// Random but fixed for the whole day; never the same theme two days in a row
+function themeIdx(k){const i=hash(k+"theme")%THEMES.length;const d=fromKey(k);d.setDate(d.getDate()-1);
+  const y=hash(keyOf(d)+"theme")%THEMES.length;return i===y?(i+1)%THEMES.length:i;}
+const themeFor=k=>THEMES[themeIdx(k)];
 const TIPS = [
 ["Topic sentence","Open with one sentence that states your main idea plainly."],
 ["One strong example","Support your point with a single specific, concrete example."],
@@ -586,12 +617,16 @@ const setSync=t=>{document.getElementById("sync").textContent=t;};
 /* derived */
 function learnDone(k){const d=S.days[k];return !!d&&wordsFor(k).every(w=>d.learn[w.w]!==undefined);}
 function learned(){const out=[];Object.keys(S.days).sort().forEach(k=>{if(learnDone(k))wordsFor(k).forEach(w=>{if(!out.includes(w.w))out.push(w.w);});});return out;}
-function dayXP(k){const d=S.days[k];if(!d)return 0;let xp=0;
-  wordsFor(k).forEach(w=>{const a=d.learn[w.w];if(a!==undefined){xp+=5;if(a===w.def)xp+=5;}});
-  (d.recall.items||[]).forEach(it=>{if(d.recall[it.w]===it.w)xp+=10;});
-  if(d.reason!=null)xp+=d.reason===0?20:5;
-  if(d.write&&d.write.done)xp+=30+(d.write.bonus?10:0);return xp;}
-function xpTotal(){let xp=0;for(const k in S.days)xp+=dayXP(k);return xp;}
+/* Hearts (the daily challenge's reward, replacing XP):
+   Learn: 1 for a correct first guess · Recall: 1 per correct gap · Reason: 2 for the right answer
+   Write: 2 for submitting, +1 if you used all of today's words (and the review word) */
+const HEARTS={learn:1,recall:1,reason:2,write:2,bonus:1};
+function dayHearts(k){const d=S.days[k];if(!d)return 0;let n=0;
+  wordsFor(k).forEach(w=>{if(d.learn[w.w]===w.def)n+=HEARTS.learn;});
+  (d.recall.items||[]).forEach(it=>{if(d.recall[it.w]===it.w)n+=HEARTS.recall;});
+  if(d.reason===0)n+=HEARTS.reason;
+  if(d.write&&d.write.done)n+=HEARTS.write+(d.write.bonus?HEARTS.bonus:0);return n;}
+function heartsTotal(){let n=0;for(const k in S.days)n+=dayHearts(k);return n;}
 function streak(){let n=0;let d=new Date();const done=k=>S.days[k]&&S.days[k].write&&S.days[k].write.done;
   if(!done(keyOf(d)))d.setDate(d.getDate()-1);
   while(done(keyOf(d))){n++;d.setDate(d.getDate()-1);}return n;}
@@ -601,10 +636,8 @@ const stepDone={learn:()=>learnDone(TODAY),
 
 /* ---------- Header ---------- */
 function renderHeader(){
-  const t=fromKey(TODAY);const n=dayIdx(TODAY)+1;
-  document.getElementById("entryLine").textContent=t.toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric",year:"numeric"})+(n>0?"  ·  Day "+n+" of practice":"");
   document.getElementById("sStreak").textContent=streak();
-  document.getElementById("sXP").textContent=xpTotal();
+  document.getElementById("sXP").textContent=heartsTotal();
   document.getElementById("sWords").textContent=learned().length;
   const wk=document.getElementById("week");wk.innerHTML="";
   for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const k=keyOf(d);
@@ -614,10 +647,10 @@ function renderHeader(){
   // Home screen: one-line summary + how far today's challenge is
   const doneCount=steps.filter(([id])=>stepDone[id]()).length;
   document.getElementById("dailyStatus").textContent=doneCount===4?"Done for today ✓":doneCount?doneCount+"/4 stations done":"4 quick stations";
-  document.getElementById("homeStats").textContent="★ "+streak()+"-day streak  ·  "+xpTotal()+" XP  ·  "+learned().length+" words";
+  document.getElementById("homeStats").textContent="★ "+streak()+"-day streak  ·  ♥ "+heartsTotal()+" hearts  ·  "+learned().length+" words";
   renderScores();
-  // Daily theme = today's writing focus skill (shown in the tag under the title)
-  document.getElementById("theme").textContent="Theme: "+tipFor()[0];
+  // Today's random theme (shown in the tag under the title)
+  document.getElementById("theme").textContent="Theme: "+themeFor(TODAY)[0];
 }
 
 /* ---------- Learn ---------- */
@@ -630,7 +663,7 @@ function renderLearn(){
     const ans=d.learn[w.w];
     const optHtml=opts.map(o=>{let c="opt";if(ans!==undefined){if(o===w.def)c+=" right";else if(o===ans)c+=" wrong";else c+=" dim";}
       return `<button class="${c}" data-learn="${esc(w.w)}" data-v="${esc(o)}" ${ans!==undefined?"disabled":""}>${esc(o)}</button>`;}).join("");
-    const rev=ans!==undefined?`<div class="reveal"><span class="verdict ${ans===w.def?"g":"b"}">${ans===w.def?"NICE GUESS · +10 XP":"NOW YOU KNOW · +5 XP"}</span><p class="def">${esc(w.def)}</p><p class="ex">“${esc(w.ex)}”</p></div>`:"";
+    const rev=ans!==undefined?`<div class="reveal"><span class="verdict ${ans===w.def?"g":"b"}">${ans===w.def?"NICE GUESS · +1 ♥":"NOW YOU KNOW · NO HEART THIS TIME"}</span><p class="def">${esc(w.def)}</p><p class="ex">“${esc(w.ex)}”</p></div>`:"";
     return `<div class="word"><div class="headword"><h3>${esc(w.w)}</h3><span class="pron">/${esc(w.pr)}/</span><span class="pos">${esc(w.pos)}</span></div>
       ${ans===undefined?`<p class="q">What do you think <b>${esc(w.w)}</b> means?</p>`:""}<div class="opts">${optHtml}</div>${rev}</div>`;
   }).join("");
@@ -659,7 +692,7 @@ function renderRecall(){
     const sent=esc(parts[0])+`<span class="gap">${ans!==undefined?esc(m?m[0]:w.w):"&nbsp;"}</span>`+esc(parts.slice(1).join(""));
     const opts=it.opts.map(o=>{let c="opt";if(ans!==undefined){if(o===it.w)c+=" right";else if(o===ans)c+=" wrong";else c+=" dim";}
       return `<button class="${c}" data-recall="${esc(it.w)}" data-v="${esc(o)}" ${ans!==undefined?"disabled":""}>${esc(o)}</button>`;}).join("");
-    const v=ans!==undefined?`<span class="verdict ${ans===it.w?"g":"b"}">${ans===it.w?"CORRECT · +10 XP":"IT WAS “"+esc(it.w).toUpperCase()+"”: "+esc(w.def)}</span>`:"";
+    const v=ans!==undefined?`<span class="verdict ${ans===it.w?"g":"b"}">${ans===it.w?"CORRECT · +1 ♥":"IT WAS “"+esc(it.w).toUpperCase()+"”: "+esc(w.def)}</span>`:"";
     return `<div class="blank-item">${it.prev?'<span class="label">Review</span>':'<span class="label">Today</span>'}<p class="sentence">${sent}</p><div class="chips-opts">${opts}</div>${v}</div>`;
   }).join("");
 }
@@ -673,11 +706,11 @@ function renderReason(){
   const opts=order.map(i=>{let c="opt";if(ans!=null){if(i===0)c+=" right";else if(i===ans)c+=" wrong";else c+=" dim";}
     return `<button class="${c}" data-reason="${i}" ${ans!=null?"disabled":""}>${esc(p[2][i])}</button>`;}).join("");
   document.getElementById("reasonBox").innerHTML=`<span class="puzzle-type">${esc(p[0])}</span><p class="puzzle-q">${esc(p[1])}</p><div class="opts">${opts}</div>`+
-    (ans!=null?`<div class="reveal"><span class="verdict ${ans===0?"g":"b"}">${ans===0?"CORRECT · +20 XP":"NOT QUITE · +5 XP FOR TRYING"}</span><p>${esc(p[4])}</p></div>`:"");
+    (ans!=null?`<div class="reveal"><span class="verdict ${ans===0?"g":"b"}">${ans===0?"CORRECT · +2 ♥":"NOT QUITE · NO HEART THIS TIME"}</span><p>${esc(p[4])}</p></div>`:"");
 }
 
 /* ---------- Write ---------- */
-function promptFor(){const d=day();return PROMPTS[mod(dayIdx(TODAY)*5+(d.write.promptShift||0),PROMPTS.length)];}
+function promptFor(){const d=day();const ps=themeFor(TODAY)[1];return ps[mod(d.write.promptShift||0,ps.length)];}
 function tipFor(){return TIPS[mod(dayIdx(TODAY),TIPS.length)];}
 function reviewWord(){const today=wordsFor(TODAY).map(w=>w.w);const prev=learned().filter(w=>!today.includes(w));
   if(!prev.length)return null;return prev[Math.floor(rng(hash(TODAY+"rw"))()*prev.length)];}
@@ -720,13 +753,14 @@ async function submitWriting(){
   const d=day();const first=!d.write.done;
   d.write.text=text;d.write.done=true;d.write.bonus=d.write.bonus||a.all;d.write.prompt=promptFor()[1];
   save();renderAll(false);
-  if(first)document.getElementById("submitNote").textContent="Entry saved · +"+(30+(a.all?10:0))+" XP";
+  if(first)document.getElementById("submitNote").textContent="Entry saved · +"+(HEARTS.write+(a.all?HEARTS.bonus:0))+" ♥";
   if(!sampleFn){renderFeedback();return;}
   busy=true;renderWriteLive();
   const note=document.getElementById("submitNote");note.textContent="Reading your paragraph… this can take up to a minute.";
   const ws=wordsFor(TODAY).concat(a.rw?[BY[a.rw]]:[]);
   const prompt=`You are a supportive but honest writing coach for an adult improving their English writing, vocabulary, and reasoning. Evaluate the paragraph below.
 
+Theme of the day: ${themeFor(TODAY)[0]}
 Writing prompt: ${promptFor()[1]}
 Focus skill today: ${tipFor()[0]} — ${tipFor()[1]}
 Target vocabulary (word: meaning):
@@ -805,7 +839,7 @@ function applyCard(){
   document.getElementById("cardPrev").disabled=d.card===0;
   const next=document.getElementById("cardNext");next.disabled=d.card===C.length-1;
   next.classList.toggle("ready",cur.done&&d.card<C.length-1); // nudge the ▶ once the card is answered
-  document.getElementById("dayScore").textContent=dayXP(TODAY)+" XP";
+  document.getElementById("dayScore").textContent="× "+dayHearts(TODAY);
 }
 function goCard(i){day().card=i;save();applyCard();const st=document.getElementById("secName");if(st.getBoundingClientRect().top<0)st.scrollIntoView({block:"start"});}
 
@@ -992,7 +1026,7 @@ function renderQuiz(){
   const over=Q.i>=Q.qs.length||Q.lives<=0;
   if(over){
     // Save each finished run once
-    if(!Q.saved){Q.saved=true;Q.prevBest=S.quiz.runs.length?Math.max(...S.quiz.runs.map(r=>r.s)):0;S.quiz.runs.push({d:TODAY,s:Q.score,n:QN});save();renderHeader();}
+    if(!Q.saved){Q.saved=true;Q.prevBest=S.quiz.runs.length?Math.max(...S.quiz.runs.map(r=>r.s)):0;S.quiz.runs.push({d:TODAY,s:Q.score,n:QN,a:Q.score+(LIVES-Q.lives)});save();renderHeader();}
     const best=Math.max(...S.quiz.runs.map(r=>r.s));
     box.innerHTML=`<div class="quiz-end"><span class="label">${Q.lives<=0?"Game over":"Quiz complete"}</span>
       <span class="ico" data-sprite="${Q.score>=8?"trophy":"star"}" style="width:56px;height:56px"></span>
@@ -1019,8 +1053,38 @@ function renderQuiz(){
   if(done){const n=document.getElementById("quizNext");n&&n.focus({preventScroll:true});}
 }
 
+/* Skill bars: % correct per part of the game, across every day played */
+const SKILL_TIPS={vocab:"Before picking an answer, look for word parts you already know (like \"bene-\" = good).",
+  memory:"Skim your word bank before the Recall cards. Seeing a word again is what makes it stick.",
+  reason:"Read the puzzle twice and rule out the clearly wrong answers first.",
+  quiz:"Play one quick quiz a day. Short, frequent practice beats long sessions."};
+function skillStats(){
+  let v=[0,0],m=[0,0],r=[0,0];
+  for(const k in S.days){const d=S.days[k];
+    wordsFor(k).forEach(w=>{const a=d.learn[w.w];if(a!==undefined){v[1]++;if(a===w.def)v[0]++;}});
+    (d.recall.items||[]).forEach(it=>{const a=d.recall[it.w];if(a!==undefined){m[1]++;if(a===it.w)m[0]++;}});
+    if(d.reason!=null){r[1]++;if(d.reason===0)r[0]++;}}
+  const q=S.quiz.runs.reduce((acc,x)=>[acc[0]+x.s,acc[1]+(x.a!=null?x.a:x.n)],[0,0]);
+  return [["vocab","Vocabulary","Learn cards",v],["memory","Memory","Recall cards",m],["reason","Reasoning","Daily puzzle",r],["quiz","Quiz","Test your Knowledge",q]]
+    .map(([id,name,from,[ok,tot]])=>({id,name,from,ok,tot,p:tot?Math.round(ok/tot*100):null}));
+}
+function renderSkills(){
+  const rows=skillStats();const tried=rows.filter(x=>x.p!=null);
+  // only call something "needs improvement" once there are a few answers to judge from
+  const weak=tried.filter(x=>x.tot>=3).sort((a,b)=>a.p-b.p)[0];
+  document.getElementById("skills").innerHTML=rows.map(x=>{const isWeak=weak&&x.id===weak.id&&tried.length>1;
+    return `<div class="skill${isWeak?" weak":""}${x.p==null?" none":""}" title="${x.p==null?"No answers yet":x.ok+" of "+x.tot+" correct"}">
+      <span class="skill-name">${esc(x.name)}<small>${isWeak?"Needs improvement":esc(x.from)}</small></span>
+      <div class="skill-track" role="img" aria-label="${esc(x.name)}: ${x.p==null?"no answers yet":x.p+"% correct"}"><div class="skill-fill" style="width:${x.p||0}%"></div></div>
+      <span class="skill-pct">${x.p==null?"–":x.p+"%"}</span></div>`;}).join("");
+  const tip=document.getElementById("skillTip");
+  if(weak&&tried.length>1){tip.hidden=false;tip.textContent="Needs improvement: "+weak.name+" ("+weak.p+"%). Tip: "+SKILL_TIPS[weak.id];}
+  else{tip.hidden=false;tip.textContent=tried.length?"Keep playing! After a few more answers, this will show which skill to practice.":"No answers yet. Play the Daily Challenge or a quiz to fill these bars.";}
+}
+
 /* Scores / History: best quiz score and the 10 most recent runs */
 function renderScores(){
+  renderSkills();
   const runs=S.quiz.runs;
   document.getElementById("sBest").textContent=runs.length?Math.max(...runs.map(r=>r.s))+"/"+QN:"–";
   document.getElementById("runs").innerHTML=runs.length?runs.slice(-10).reverse().map(r=>
@@ -1028,7 +1092,36 @@ function renderScores(){
     '<p class="empty">No quiz runs yet. Try "Test your Knowledge" from the home screen.</p>';
 }
 
+/* Bunny cursor: draw the bunny sprite onto a tiny canvas and use it as the cursor for buttons.
+   It is drawn at 2× and marked as 2× (image-set), so it shows at about 12×10 px and stays sharp on retina screens. */
+function setBunnyCursor(){
+  try{
+    const g=SPRITES.bunny,S2=2,cv=document.createElement("canvas");cv.width=g[0].length*S2;cv.height=g.length*S2;
+    const ctx=cv.getContext("2d");const edge=getComputedStyle(document.documentElement).getPropertyValue("--edge").trim();
+    g.forEach((row,y)=>[...row].forEach((c,x)=>{const col=c==="o"?edge:PAL[c];if(col){ctx.fillStyle=col;ctx.fillRect(x*S2,y*S2,S2,S2);}}));
+    const url=cv.toDataURL("image/png");
+    const st=document.createElement("style");
+    // first line: plain image (works everywhere); second/third: the sharper 2× version where supported
+    st.textContent=`button:not(:disabled){cursor:url(${url}) 12 10,pointer;cursor:-webkit-image-set(url(${url}) 2x) 6 5,pointer;cursor:image-set(url(${url}) 2x) 6 5,pointer}`;
+    document.head.appendChild(st);
+  }catch(e){}
+}
+
+/* Click effect: the button flashes and a few tiny pixel hearts/sparkles pop out from the click point */
+document.addEventListener("pointerdown",e=>{
+  const b=e.target.closest("button");if(!b||b.disabled)return;
+  b.classList.remove("flash");void b.offsetWidth;b.classList.add("flash");
+  if(REDUCED)return;
+  const heart=sprite("heart");
+  for(let i=0;i<7;i++){const el=document.createElement("span");const ang=i/7*Math.PI*2+Math.random()*.5,dist=22+Math.random()*18;
+    el.className="burst"+(i%3===0?" h":"");if(i%3===0)el.innerHTML=heart;
+    el.style.left=e.clientX+"px";el.style.top=e.clientY+"px";
+    el.style.setProperty("--dx",Math.round(Math.cos(ang)*dist)+"px");el.style.setProperty("--dy",Math.round(Math.sin(ang)*dist)+"px");
+    document.body.appendChild(el);setTimeout(()=>el.remove(),500);}
+});
+
 fillSprites();
+setBunnyCursor();
 renderAll();
 go(location.hash.slice(1)); // open the screen named in the URL, or the home screen
 
