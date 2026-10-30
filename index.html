@@ -4,46 +4,30 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
-<title>WordSmith</title>
+<title>Lenga</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <!-- Pixelify Sans = chunky retro-game headings/buttons, VT323 = old terminal labels, Literata = readable body text -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=VT323&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&display=swap">
 <style>
-/* Layout: a home screen (title scene + About dialog + 4-button menu) that opens four views:
-   Daily Challenge (Learn → Recall → Reason → Write), Random Facts, Test your Knowledge, Scores/History.
-   Look: light-pink, cozy pixel-art "vintage game" — squared corners, chunky stepped borders, dialog boxes. */
+/* Lenga — layout: a home screen (title + bunny, About dialog, 4-button menu) that opens four views:
+   Daily Challenge (one card at a time: Learn → Recall → Reason → Write), Random Facts, Test your Knowledge, Scores/History.
+   Look: light pink, cozy pixel-art "vintage game" — squared corners, chunky stepped borders, dialog boxes.
+   Every page uses the same tokens and pieces below so the whole game looks the same. */
 :root{
-  /* Light theme: soft pink paper, plum ink (like the text in an old RPG dialog box) */
-  --paper:#FBEEF3; --card:#FFF9FB; --ink:#4A3A68; --muted:#8B7A9F; --rule:#EBCFDC;
-  --accent:#D45F8C; --accent-soft:#FBE0EA; --marker:#FFE1A1; --marker-ink:#4A3A68;
-  --good:#4F9463; --good-soft:#E1F2E3; --bad:#CC4A5A; --bad-soft:#FBE0E3;
-  /* Pixel kit colors: --edge = the dark pixel outline, --face/--shade = button top & bevel */
-  --edge:#6A4F86; --face:#FFE6EF; --shade:#F2B8CD; --hi:#FFFFFF;
-  --primary-face:#F7A8C4; --primary-shade:#D9799E;
-  /* Title scene: stepped sky bands (lavender → blush) and a soft green hill */
-  --sky1:#D8CCEA; --sky2:#E4D2EA; --sky3:#F0DAE9; --sky4:#F8E3EC; --hill:#A9CC9C; --hill-dark:#86B07A; --moon:#FFF1B8;
+  /* Light pink everywhere. Outlines and text are deep rose/berry (not purple) so the page stays pink.
+     The page intentionally stays light even when the device is in dark mode. */
+  color-scheme:light;
+  --paper:#FFF0F5; --card:#FFFAFC; --ink:#6B3550; --muted:#A57089; --rule:#F5CFDE;
+  --accent:#E0679A; --accent-soft:#FFE1EC; --marker:#FFE1A1; --marker-ink:#6B3550;
+  --good:#4F9463; --good-soft:#E3F3E4; --bad:#D9485F; --bad-soft:#FFE0E5;
+  /* Pixel kit colors: --edge = the pixel outline, --face/--shade = button top & bevel */
+  --edge:#C2507F; --face:#FFE6EF; --shade:#F8BCD2; --hi:#FFFFFF;
+  --primary-face:#F9A3C5; --primary-shade:#E075A2;
   --f-pixel:"Pixelify Sans", "Courier New", monospace;
   --f-display:var(--f-pixel);
   --f-body:"Literata", Georgia, "Times New Roman", serif;
   --f-mono:"VT323", ui-monospace, Menlo, Consolas, monospace;
 }
-/* Dark theme: the same game "at night" — dusky purple sky, pink highlights */
-@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
-  --paper:#251D3A; --card:#30264B; --ink:#F7E9F1; --muted:#BDAACF; --rule:#4A3B68;
-  --accent:#F59BC2; --accent-soft:#4A3560; --marker:#E9C46A; --marker-ink:#251D3A;
-  --good:#7FD39A; --good-soft:#203D33; --bad:#FF8A96; --bad-soft:#4A2433;
-  --edge:#120C22; --face:#4A3A6B; --shade:#382B55; --hi:#6C5891;
-  --primary-face:#C45A8A; --primary-shade:#943F69;
-  --sky1:#231C3D; --sky2:#2F2450; --sky3:#432D5E; --sky4:#5A3868; --hill:#3F5E4A; --hill-dark:#2F4A39; --moon:#FFE9A8;
-  color-scheme:dark } }
-:root[data-theme="dark"]{
-  --paper:#251D3A; --card:#30264B; --ink:#F7E9F1; --muted:#BDAACF; --rule:#4A3B68;
-  --accent:#F59BC2; --accent-soft:#4A3560; --marker:#E9C46A; --marker-ink:#251D3A;
-  --good:#7FD39A; --good-soft:#203D33; --bad:#FF8A96; --bad-soft:#4A2433;
-  --edge:#120C22; --face:#4A3A6B; --shade:#382B55; --hi:#6C5891;
-  --primary-face:#C45A8A; --primary-shade:#943F69;
-  --sky1:#231C3D; --sky2:#2F2450; --sky3:#432D5E; --sky4:#5A3868; --hill:#3F5E4A; --hill-dark:#2F4A39; --moon:#FFE9A8;
-  color-scheme:dark }
 /* Pixel frame: four flat shadows draw a 3px outline with notched (pixel-rounded) corners */
 :root{ --frame:0 -3px 0 0 var(--edge), 0 3px 0 0 var(--edge), -3px 0 0 0 var(--edge), 3px 0 0 0 var(--edge); }
 
@@ -54,7 +38,10 @@ body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-siz
 h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.15}
 p{margin:0}
 .label{font-family:var(--f-mono);font-size:17px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
-button{font:inherit;cursor:pointer}
+/* Buttons show a tiny pixel bunny as the mouse cursor. --bunny-cursor is filled in by setBunnyCursor() in the script;
+   until then (or if the browser can't use it) the normal hand pointer shows. */
+button{font:inherit;cursor:var(--bunny-cursor,pointer)}
+button:disabled{cursor:not-allowed}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
 /* Header */
@@ -71,12 +58,13 @@ button{font:inherit;cursor:pointer}
 .dot.done{background:var(--accent);border-color:var(--accent);color:var(--card)}
 .dot.today{border-color:var(--accent);border-width:2px}
 
-.steps{display:flex;gap:8px;flex-wrap:wrap;position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);padding:10px 0;border-bottom:1px solid var(--rule)}
+/* Challenge progress: one pixel segment per card; filled = answered, outlined = current card */
+.steps{display:flex;gap:5px;margin:0 3px}
+.seg{flex:1;height:14px;border:0;padding:0;background:var(--rule);border-radius:0}
+.seg.done{background:var(--accent)}
+.seg.cur{box-shadow:var(--frame);background:var(--primary-face)}
+.seg.cur.done{background:var(--accent)}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
-.steps a{display:flex;align-items:center;gap:7px;text-decoration:none;color:var(--ink);font-family:var(--f-display);font-weight:500;font-size:14px;padding:6px 12px;border:2px solid var(--edge);border-radius:0;background:var(--face);box-shadow:inset -2px -2px 0 var(--shade)}
-.steps a .n{font-family:var(--f-mono);font-size:16px;color:var(--muted)}
-.steps a.done{border-color:var(--good);background:var(--good-soft)}
-.steps a.done .n{color:var(--good)}
 
 /* Stations */
 .station{background:var(--card);border:0;border-radius:0;box-shadow:var(--frame),inset 0 -4px 0 var(--accent-soft);padding:22px clamp(16px,4vw,28px);display:flex;flex-direction:column;gap:18px;scroll-margin-top:72px}
@@ -85,7 +73,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .st-head p{color:var(--muted);font-size:15px}
 
 .words{display:flex;flex-direction:column;gap:0}
-.word{padding:18px 0;border-top:1px solid var(--rule);display:flex;flex-direction:column;gap:10px}
+.word{padding:0;display:flex;flex-direction:column;gap:10px}
 .word:first-child{border-top:0;padding-top:4px}
 .headword{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 12px}
 .headword h3{font-size:30px;font-weight:800;letter-spacing:-.01em}
@@ -95,6 +83,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .opts{display:grid;gap:8px}
 .opt{text-align:left;background:var(--paper);color:var(--ink);border:2px solid var(--rule);border-radius:0;box-shadow:inset -3px -3px 0 var(--accent-soft);padding:10px 14px;font-family:var(--f-body);font-size:15px;line-height:1.45}
 .opt:hover:not(:disabled){border-color:var(--edge);background:var(--face)}
+.opt:active:not(:disabled){transform:translateY(2px)}
 .opt:disabled{cursor:default}
 .opt.right{border-color:var(--good);background:var(--good-soft)}
 .opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
@@ -105,7 +94,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .verdict{font-family:var(--f-mono);font-size:17px;letter-spacing:.04em}
 .verdict.g{color:var(--good)} .verdict.b{color:var(--bad)}
 
-.blank-item{display:flex;flex-direction:column;gap:10px;padding:14px 0;border-top:1px solid var(--rule)}
+.blank-item{display:flex;flex-direction:column;gap:10px}
 .blank-item:first-child{border-top:0;padding-top:0}
 .sentence{font-size:17px}
 .sentence .gap{display:inline-block;min-width:90px;border-bottom:2px solid var(--accent);text-align:center;font-weight:600}
@@ -170,7 +159,7 @@ textarea:focus{border-color:var(--accent);outline:none}
 .view{display:flex;flex-direction:column;gap:28px}
 .view[hidden]{display:none}
 .topbar{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
-.topbar h1{font-size:clamp(26px,6vw,36px);font-weight:700}
+.topbar h1{font-size:clamp(24px,5.5vw,34px);font-weight:700;background:var(--card);padding:6px 16px;margin:3px;box-shadow:var(--frame),6px 6px 0 0 var(--shade)}
 
 /* ---------- Pixel button (home menu + "◀ Home") ----------
    --frame draws the notched outline; the extra 0 8px shadow is the button's "depth".
@@ -190,25 +179,17 @@ textarea:focus{border-color:var(--accent);outline:none}
 .ico{flex:none;width:36px;height:36px;display:grid;place-items:center}
 .ico svg,.sprite svg{display:block;width:100%;height:100%;shape-rendering:crispEdges}
 
-/* ---------- Home: pixel title scene ---------- */
-.scene{position:relative;height:clamp(200px,42vw,280px);overflow:hidden;box-shadow:var(--frame);margin:3px;
-  /* Hard color stops = flat horizontal bands, like a 16-color sky */
-  background:linear-gradient(to bottom,var(--sky1) 0 22%,var(--sky2) 22% 42%,var(--sky3) 42% 62%,var(--sky4) 62% 100%)}
-.scene .star{position:absolute;width:4px;height:4px;background:var(--hi);opacity:.9}
-.scene .star.big{width:6px;height:6px}
-@media (prefers-reduced-motion: no-preference){ .scene .star{animation:twinkle 2.4s steps(2) infinite} .scene .star:nth-child(odd){animation-delay:1.2s} }
-@keyframes twinkle{50%{opacity:.25}}
-.sprite{position:absolute}
-.scene .moon{top:9%;left:7%;width:clamp(38px,8vw,56px);height:clamp(38px,8vw,56px)}
-.scene .hill{position:absolute;left:0;bottom:0;width:100%;height:38%}
-.scene .bunny{bottom:16%;right:12%;width:clamp(48px,11vw,72px);height:clamp(40px,9vw,60px)}
-.scene .shroom{bottom:9%;left:9%;width:24px;height:24px}
-.scene .flower{width:16px;height:16px}
-.home-title{position:absolute;inset:0 0 auto;padding-top:clamp(28px,7vw,44px);text-align:center}
-.home-title .welcome{font-family:var(--f-pixel);font-size:clamp(16px,3.6vw,22px);letter-spacing:.3em;color:var(--accent);text-shadow:2px 2px 0 var(--hi)}
-.home-title h1{font-family:var(--f-pixel);font-size:clamp(42px,11vw,76px);font-weight:700;color:var(--ink);letter-spacing:.02em;
-  text-shadow:4px 4px 0 var(--hi),6px 6px 0 var(--shade)}
-.home-title h1 span{color:var(--accent)}
+/* ---------- Home: "WELCOME!" + Lenga logo with the bunny beside it, no box around it ---------- */
+.hero{display:flex;align-items:center;justify-content:center;gap:clamp(14px,4vw,32px);padding-top:8px}
+.hero-text{text-align:center}
+.hero .welcome{font-family:var(--f-pixel);font-size:clamp(17px,3.8vw,24px);letter-spacing:.32em;color:var(--accent);margin-bottom:2px}
+.hero h1{font-family:var(--f-pixel);font-size:clamp(56px,15vw,104px);font-weight:700;color:var(--accent);letter-spacing:.04em;line-height:1;
+  text-shadow:4px 4px 0 var(--hi),7px 7px 0 var(--shade)}
+/* dashed pixel underline, like the line under WELCOME! in the sketch */
+.hero-rule{display:block;height:6px;margin:14px auto 0;width:80%;background:repeating-linear-gradient(90deg,var(--edge) 0 12px,transparent 12px 20px)}
+.hero-bunny{flex:none;width:clamp(64px,16vw,112px);height:clamp(54px,13vw,94px)}
+@media (prefers-reduced-motion: no-preference){ .hero-bunny{animation:hop 1.6s steps(1) infinite} }
+@keyframes hop{0%,60%,100%{transform:none}70%,90%{transform:translateY(-8px)}}
 
 /* ---------- Dialog box (About, facts, quiz questions) ----------
    Modeled on old RPG text boxes: inner light border, pixel font, blinking ▼ "next" arrow */
@@ -221,15 +202,28 @@ textarea:focus{border-color:var(--accent);outline:none}
 @media (prefers-reduced-motion: no-preference){ .dialog-next{animation:blink 1s steps(2) infinite} }
 @keyframes blink{50%{opacity:0}}
 .dialog.typing .dialog-next{visibility:hidden}
-.home-dialog{margin-top:-6px}
 
 /* ---------- Home menu: 2×2 grid of big pixel buttons (one column on phones) ---------- */
 .menu{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px 22px}
 .home-stats{text-align:center;font-family:var(--f-mono);font-size:19px;color:var(--muted)}
 
-/* ---------- Random facts ---------- */
+/* ---------- Random facts ----------
+   A big round pixel button you press to roll a fact; the fact card shows a pixel picture,
+   the description in a dialog box, and Liked / Dislike buttons. */
+.fact-roll{display:flex;flex-direction:column;align-items:center;gap:10px}
+.fact-orb{position:relative;width:clamp(170px,48vw,220px);aspect-ratio:1;border:0;padding:0;background:none;color:var(--ink);
+  filter:drop-shadow(0 7px 0 var(--edge))}
+.fact-orb:active{transform:translateY(5px);filter:drop-shadow(0 2px 0 var(--edge))}
+.fact-orb .orb-bg{position:absolute;inset:0}
+.orb-label{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;font-family:var(--f-pixel);font-weight:700;font-size:clamp(18px,4.6vw,23px)}
+.orb-label .ico{width:44px;height:44px}
+.fact-hint{font-family:var(--f-mono);font-size:20px;color:var(--muted)}
+.fact-card{align-items:center;text-align:center}
+.fact-img{width:144px;height:144px;image-rendering:pixelated;background:var(--accent-soft);box-shadow:var(--frame),inset 0 0 0 6px var(--hi);margin:3px}
+.fact-card .dialog{align-self:stretch;text-align:left;cursor:default}
+.vote{display:flex;gap:18px;justify-content:center;flex-wrap:wrap}
+.vote .btn[aria-pressed="true"]{background:var(--primary-face);transform:translateY(3px);box-shadow:var(--frame),inset -3px -3px 0 var(--primary-shade)}
 .fact-word{color:var(--accent)}
-.fact-row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .fact-count{font-family:var(--f-mono);font-size:19px;color:var(--muted)}
 
 /* ---------- Quiz ---------- */
@@ -242,11 +236,58 @@ textarea:focus{border-color:var(--accent);outline:none}
 .quiz-end .big{font-family:var(--f-pixel);font-size:56px;font-weight:700;color:var(--accent);line-height:1}
 .rank{font-family:var(--f-pixel);font-size:24px}
 
+/* ---------- Daily challenge: theme tag, section name, one card with ◀ ▶ beside it, score below ---------- */
+.theme-tag{align-self:flex-start;font-family:var(--f-mono);font-size:20px;background:var(--card);padding:1px 12px;margin:-10px 3px 0 clamp(70px,16vw,110px);box-shadow:var(--frame)}
+.sec-name{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;font-family:var(--f-pixel);font-weight:600;font-size:22px;color:var(--accent)}
+.sec-name small{font-family:var(--f-mono);font-weight:400;font-size:19px;color:var(--muted)}
+.stage{display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"prev cards next";gap:12px;align-items:start}
+.stage .cards{grid-area:cards;min-width:0;display:flex;flex-direction:column}
+.arrow{font-size:22px;padding:16px 12px;position:sticky;top:40vh;margin-top:90px}
+#cardPrev{grid-area:prev} #cardNext{grid-area:next}
+.arrow:disabled{opacity:.35;cursor:not-allowed}
+@media (prefers-reduced-motion: no-preference){ .arrow.ready{animation:nudge 1s steps(2) infinite} }
+@keyframes nudge{50%{transform:translateX(4px)}}
+.score-box{align-self:center;display:flex;align-items:baseline;gap:14px;font-family:var(--f-pixel);font-size:20px;font-weight:600;background:var(--face);padding:10px 24px;margin:3px;
+  box-shadow:var(--frame),inset -4px -4px 0 var(--shade),inset 4px 4px 0 var(--hi)}
+.score-box b{color:var(--accent);font-size:24px}
+/* Phones: card full width, arrows underneath */
+@media (max-width:620px){
+  .stage{grid-template-columns:1fr 1fr;grid-template-areas:"cards cards" "prev next"}
+  .arrow{position:static;margin-top:4px}
+  #cardPrev{justify-self:start} #cardNext{justify-self:end}
+}
+
+/* ---------- Click effect: a little burst of pixel hearts/sparkles where you clicked ---------- */
+.burst{position:fixed;width:6px;height:6px;pointer-events:none;z-index:50;background:var(--accent);
+  animation:burst .45s steps(5) forwards}
+.burst.h{background:none;width:10px;height:9px}
+.burst.h svg{width:100%;height:100%;display:block;shape-rendering:crispEdges}
+@keyframes burst{from{transform:translate(-50%,-50%) scale(1);opacity:1}to{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(.6);opacity:0}}
+/* clicked buttons also flash brighter for a moment */
+.flash{animation:flash .18s steps(2)}
+@keyframes flash{50%{filter:brightness(1.15) saturate(1.2)}}
+
+/* Hearts score box: heart icon + count */
+.score-box .ico{width:24px;height:24px}
+
 /* ---------- Scores / history ---------- */
 .runs{display:flex;flex-direction:column}
 .run{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-top:2px dotted var(--rule);font-family:var(--f-mono);font-size:19px}
 .run:first-child{border-top:0}
 .run b{font-family:var(--f-pixel);color:var(--accent)}
+/* Skill bars (option B): % correct per skill, weakest one marked "Needs improvement" */
+.skills{display:flex;flex-direction:column;gap:14px}
+.skill{display:grid;grid-template-columns:minmax(120px,190px) minmax(0,1fr) 52px;align-items:center;gap:12px}
+.skill-name{font-family:var(--f-mono);font-size:19px;line-height:1.1}
+.skill-name small{display:block;font-size:16px;color:var(--muted)}
+.skill-track{height:20px;background:#F7DCE7}
+.skill-fill{height:100%;background:#2A86C4;transition:width .3s steps(6)}
+.skill.weak .skill-fill{background:#D9548C}
+.skill.weak .skill-name{color:#B83A6E}
+.skill-pct{font-family:var(--f-mono);font-size:20px;font-variant-numeric:tabular-nums}
+.skill.none .skill-pct{color:var(--muted)}
+.callout{font-family:var(--f-mono);font-size:19px;background:var(--face);padding:6px 12px;border-left:4px solid #D9548C}
+@media (max-width:480px){.skill{grid-template-columns:1fr 52px}.skill-track{grid-column:1/-1;grid-row:2}}
 
 @media (prefers-reduced-motion: no-preference){ .reveal,.feedback{animation:rise .35s ease both} @keyframes rise{from{transform:translateY(6px)}to{transform:none}} }
 </style>
@@ -256,14 +297,18 @@ textarea:focus{border-color:var(--accent);outline:none}
 <div class="wrap">
 
   <!-- ===================== HOME ===================== -->
-  <!-- Title scene + About dialog + main menu (layout from the hand-drawn sketch) -->
+  <!-- Title + bunny, About dialog, main menu (layout from the hand-drawn sketch) -->
   <main class="view" data-view="home">
-    <div class="scene" id="scene">
-      <!-- stars, moon, hill, bunny and flowers are drawn by drawScene() -->
-      <div class="home-title"><p class="welcome">WELCOME!</p><h1>Word<span>Smith</span></h1></div>
-    </div>
+    <header class="hero">
+      <div class="hero-text">
+        <p class="welcome">WELCOME!</p>
+        <h1>Lenga</h1>
+        <span class="hero-rule" aria-hidden="true"></span>
+      </div>
+      <span class="hero-bunny" data-sprite="bunny" aria-hidden="true"></span>
+    </header>
 
-    <section class="dialog home-dialog" id="aboutBox" aria-label="About WordSmith">
+    <section class="dialog" id="aboutBox" aria-label="About Lenga">
       <span class="dialog-name">About</span>
       <p id="aboutText"></p>
       <span class="dialog-next" aria-hidden="true">&#9660;</span>
@@ -280,7 +325,7 @@ textarea:focus{border-color:var(--accent);outline:none}
       </button>
       <button class="px-btn" type="button" data-go="history">
         <span class="ico" data-sprite="trophy"></span>
-        <span>Scores / History<small>Streaks, XP &amp; past work</small></span>
+        <span>Scores / History<small>Skills, hearts &amp; past work</small></span>
       </button>
       <button class="px-btn" type="button" data-go="quiz">
         <span class="ico" data-sprite="qblock"></span>
@@ -291,39 +336,43 @@ textarea:focus{border-color:var(--accent);outline:none}
   </main>
 
   <!-- ===================== DAILY CHALLENGE ===================== -->
-  <!-- The original four stations, unchanged in behavior -->
+  <!-- One card at a time (sketch page 3): section name above, ◀ back / next ▶ beside the card, score below.
+       Cards: 3 Learn words → Recall gaps → 1 Reason puzzle → Write. -->
   <main class="view" data-view="challenge" hidden>
     <header class="topbar">
       <button class="px-btn small" type="button" data-go="home">&#9664; Home</button>
       <h1>Daily Challenge</h1>
     </header>
-    <div class="mast-top">
-      <p class="entry-line" id="entryLine"></p>
-      <span class="sync" id="sync">Saved on this device</span>
-    </div>
+    <span class="theme-tag" id="theme">Theme</span>
+    <span class="sync" id="sync" hidden>Saved on this device</span>
 
-    <nav class="steps" id="steps" aria-label="Today's activities"></nav>
+    <p class="sec-name"><span id="secName">Learn</span><small id="cardCount"></small></p>
+    <nav class="steps" id="steps" aria-label="Today's cards"></nav>
+
+    <div class="stage" id="stage">
+    <button class="px-btn small arrow" type="button" id="cardPrev" aria-label="Back">&#9664;</button>
+    <div class="cards">
 
   <section class="station" id="learn">
-    <div class="st-head"><span class="label">Station 1 · Learn</span><h2>Today's three words</h2>
+    <div class="st-head"><h2>Today's three words</h2>
       <p>Guess each meaning first. Guessing before you're told helps the word stick.</p></div>
     <div class="words" id="learnList"></div>
   </section>
 
   <section class="station" id="recall">
-    <div class="st-head"><span class="label">Station 2 · Recall</span><h2>Fill the gap</h2>
+    <div class="st-head"><h2>Fill the gap</h2>
       <p id="recallSub">Words from earlier days come back here so you don't forget them.</p></div>
     <div id="recallList"></div>
   </section>
 
   <section class="station" id="reason">
-    <div class="st-head"><span class="label">Station 3 · Reason</span><h2>Think it through</h2>
+    <div class="st-head"><h2>Think it through</h2>
       <p>One puzzle a day: logic, analogies, and spotting weak arguments.</p></div>
     <div id="reasonBox" style="display:flex;flex-direction:column;gap:14px"></div>
   </section>
 
   <section class="station" id="write">
-    <div class="st-head"><span class="label">Station 4 · Write</span><h2>Write a paragraph</h2>
+    <div class="st-head"><h2>Write a paragraph</h2>
       <p>Aim for 80–150 words. Use at least two of today's words, plus the review word if there is one.</p></div>
     <div class="prompt-box">
       <div class="prompt-row"><span class="puzzle-type" id="pType">Describe</span><button class="linkbtn" id="nextPrompt" type="button">Try a different prompt</button></div>
@@ -340,7 +389,11 @@ textarea:focus{border-color:var(--accent);outline:none}
     </div>
     <div id="fbBox"></div>
   </section>
+    </div>
+    <button class="px-btn small arrow" type="button" id="cardNext" aria-label="Next">&#9654;</button>
+    </div>
 
+    <div class="score-box" aria-live="polite">Hearts <span class="ico" data-sprite="heart" aria-hidden="true"></span><b id="dayScore">× 0</b></div>
   </main>
 
   <!-- ===================== RANDOM FACTS ===================== -->
@@ -349,15 +402,23 @@ textarea:focus{border-color:var(--accent);outline:none}
       <button class="px-btn small" type="button" data-go="home">&#9664; Home</button>
       <h1>Random Facts</h1>
     </header>
-    <section class="dialog" id="factBox" aria-live="polite">
-      <span class="dialog-name">Did you know?</span>
-      <p id="factText"></p>
-      <span class="dialog-next" aria-hidden="true">&#9660;</span>
-    </section>
-    <div class="fact-row">
-      <span class="fact-count" id="factCount"></span>
-      <button class="btn" type="button" id="nextFact">Another fact &#9654;</button>
+    <div class="fact-roll">
+      <button class="fact-orb" type="button" id="nextFact" aria-label="Show a random fact">
+        <span class="orb-bg" data-sprite="orb" aria-hidden="true"></span>
+        <span class="orb-label"><span class="ico" data-sprite="qblock" aria-hidden="true"></span>Random Fact</span>
+      </button>
+      <p class="fact-hint" id="factHint">Tap the circle to get a random fact!</p>
     </div>
+    <section class="station fact-card" id="factCard" hidden aria-live="polite">
+      <!-- picture: the fact's emoji drawn tiny on a canvas, then scaled up with sharp pixels -->
+      <canvas class="fact-img" id="factImg" width="20" height="20" aria-hidden="true"></canvas>
+      <div class="dialog"><span class="dialog-name">Did you know?</span><p id="factText"></p></div>
+      <div class="vote">
+        <button class="btn ghost" type="button" id="likeBtn" aria-pressed="false">&#9829; Liked</button>
+        <button class="btn ghost" type="button" id="dislikeBtn" aria-pressed="false">&#10005; Dislike</button>
+      </div>
+      <span class="fact-count" id="factCount"></span>
+    </section>
   </main>
 
   <!-- ===================== TEST YOUR KNOWLEDGE ===================== -->
@@ -376,10 +437,16 @@ textarea:focus{border-color:var(--accent);outline:none}
       <h1>Scores / History</h1>
     </header>
     <section class="station">
+      <div class="st-head"><span class="label">Skills</span><h2>How you're doing</h2>
+        <p>The % of answers you got right in each part of the game.</p></div>
+      <div class="skills" id="skills"></div>
+      <p class="callout" id="skillTip" hidden></p>
+    </section>
+    <section class="station">
       <div class="st-head"><span class="label">Player stats</span><h2>Your progress</h2></div>
       <div class="stats">
         <div class="stat"><b id="sStreak">0</b><span class="label">day streak</span></div>
-        <div class="stat"><b id="sXP">0</b><span class="label">XP</span></div>
+        <div class="stat"><b id="sXP">0</b><span class="label">hearts</span></div>
         <div class="stat"><b id="sWords">0</b><span class="label">words learned</span></div>
         <div class="stat"><b id="sBest">&ndash;</b><span class="label">best quiz</span></div>
       </div>
@@ -482,29 +549,27 @@ const P = [
 ["Writing logic","\"The plan was cheap. ___, it took twice as long as expected.\" Which transition fits best?",["However","Therefore","For example","Similarly"],0,"The second sentence contrasts with the first (cheap but slow), so you need a contrast word like 'However'."],
 ["Evidence","Which detail would most strengthen a paragraph arguing that public libraries still matter?",["Library visits in the city rose 12% last year.","The writer's favorite book is a mystery.","Libraries have existed for a long time.","Everyone agrees libraries are nice."],0,"A specific, checkable figure supports the claim far better than opinions or vague statements."]
 ];
-const PROMPTS = [
-["Describe","Describe a place you went to as a child so clearly that a reader could walk through it."],
-["Argue","Should schools start later in the morning? Take a side and defend it."],
-["Narrate","Write about a time you changed your mind about something important."],
-["Explain","Explain how to do something you're good at to someone who has never tried it."],
-["Imagine","You wake up and every clock in the world has stopped. What happens next?"],
-["Reflect","What small habit makes your day better, and why does it work?"],
-["Argue","Is it better to be a specialist or a generalist? Pick one and make your case."],
-["Describe","Describe the sounds and smells of a rainy evening in a city."],
-["Compare","Compare learning from a book with learning from a video. Which sticks better for you?"],
-["Narrate","Tell the story of an ordinary object in your room from the object's point of view."],
-["Persuade","Convince a friend to try a food they've always refused."],
-["Reflect","What advice would you give yourself from five years ago?"],
-["Argue","Should people be allowed to bring pets to work?"],
-["Explain","Explain why a tradition in your family or culture matters."],
-["Imagine","Invent a new holiday and explain how people celebrate it."],
-["Describe","Describe a person you admire using only their actions, not adjectives about them."],
-["Argue","Do smartphones make us more connected or more isolated?"],
-["Narrate","Write about the first five minutes after receiving surprising news."],
-["Reflect","What is something you were bad at and got better at? How did it happen?"],
-["Compare","City life or small-town life: which would you choose for the next ten years, and why?"],
-["Explain","Explain a problem in your neighborhood and one practical way to fix it."]
+/* Daily themes: each day gets one at random (the player doesn't choose). The theme sets the writing prompt;
+   "Try a different prompt" cycles through that theme's prompts. */
+const THEMES = [
+["Animals",[["Describe","Describe an animal you've watched closely. How does it move, sound, and behave?"],["Argue","Should zoos still exist? Take a side and defend it."],["Imagine","You can understand one kind of animal for a day. Which one, and what do you learn?"]]],
+["Family",[["Narrate","Tell the story of a family tradition and how it started (or how you imagine it started)."],["Reflect","What is something a family member taught you without meaning to?"],["Compare","Big family or small family: which shapes a person more, and how?"]]],
+["Culture",[["Explain","Explain a custom from your culture to someone who has never heard of it."],["Reflect","Which part of another culture would you most like to understand, and why?"],["Argue","Is it important to keep old traditions, even when the world changes? Defend your view."]]],
+["Religion & beliefs",[["Explain","Describe a celebration or ritual from a religion or belief you know. What does it mean to the people who take part?"],["Reflect","Why do you think so many people find meaning in faith or shared beliefs?"],["Argue","Should schools teach about the world's major religions? Give your reasons."]]],
+["Food",[["Describe","Describe a meal you'll never forget: the smells, the taste, and who was there."],["Persuade","Convince a friend to try a food they've always refused."],["Explain","Explain how to cook a dish you love to someone who has never cooked."]]],
+["Nature",[["Describe","Describe the sounds and smells of a rainy evening."],["Argue","Should cities give more space to parks, even if it means fewer buildings?"],["Reflect","Where in nature do you feel most calm, and why?"]]],
+["Travel",[["Narrate","Write about a trip that didn't go as planned."],["Imagine","You can visit any place in the world tomorrow. Where do you go, and what do you do first?"],["Compare","Traveling alone or with friends: which teaches you more?"]]],
+["Friendship",[["Narrate","Tell how you met one of your closest friends."],["Reflect","What makes someone a good friend? Use one real example."],["Argue","Can you be real friends with someone you've only met online?"]]],
+["Music & art",[["Describe","Describe a song that changes your mood, without naming the song."],["Argue","Should art and music classes be required in every school?"],["Explain","Explain why a painting, photo, or song you love means something to you."]]],
+["Childhood",[["Describe","Describe a place you went to as a child so clearly that a reader could walk through it."],["Reflect","What advice would you give yourself from five years ago?"],["Narrate","Write about a game you loved as a kid and why it mattered."]]],
+["Technology",[["Argue","Do smartphones make us more connected or more isolated?"],["Imagine","Invent a gadget that would make your day easier. How does it work?"],["Reflect","What is one piece of technology you could never give up, and why?"]]],
+["Sports & games",[["Narrate","Write about a time you won, or lost, something that mattered to you."],["Argue","Are video games a sport? Take a side."],["Explain","Explain the rules of a game you love to someone who has never played."]]],
+["Dreams & goals",[["Reflect","What is one goal you have for this year, and what's your first step?"],["Imagine","Describe your life ten years from now on a perfect ordinary day."],["Narrate","Write about a time you kept going even though you wanted to quit."]]]
 ];
+// Random but fixed for the whole day; never the same theme two days in a row
+function themeIdx(k){const i=hash(k+"theme")%THEMES.length;const d=fromKey(k);d.setDate(d.getDate()-1);
+  const y=hash(keyOf(d)+"theme")%THEMES.length;return i===y?(i+1)%THEMES.length:i;}
+const themeFor=k=>THEMES[themeIdx(k)];
 const TIPS = [
 ["Topic sentence","Open with one sentence that states your main idea plainly."],
 ["One strong example","Support your point with a single specific, concrete example."],
@@ -531,12 +596,13 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"
 const stemRe=w=>new RegExp("\\b"+w.replace(/(e|y)$/,"")+"\\w*","i");
 
 /* ---------- State ---------- */
-const LS="daily-wordsmith-v1";
+const LS="daily-wordsmith-v1"; // storage key kept from the old name so progress survives the rename to Lenga
 let S={v:1,days:{}};
 try{const raw=localStorage.getItem(LS);if(raw)S=JSON.parse(raw)||S;}catch(e){}
 if(!S.days)S.days={};
 if(!S.quiz||!Array.isArray(S.quiz.runs))S.quiz={runs:[]}; // Test-your-Knowledge results: {d:dateKey, s:score, n:questions}
 if(!Array.isArray(S.facts))S.facts=[];               // indexes of Random Facts already seen
+if(!S.factVotes||typeof S.factVotes!=="object")S.factVotes={}; // fact index → 1 (liked) or -1 (disliked)
 let dbRef=null, saveT=null;
 function day(k=TODAY){if(!S.days[k])S.days[k]={learn:{},recall:{},reason:null,write:{text:"",promptShift:0}};return S.days[k];}
 function save(){
@@ -551,11 +617,16 @@ const setSync=t=>{document.getElementById("sync").textContent=t;};
 /* derived */
 function learnDone(k){const d=S.days[k];return !!d&&wordsFor(k).every(w=>d.learn[w.w]!==undefined);}
 function learned(){const out=[];Object.keys(S.days).sort().forEach(k=>{if(learnDone(k))wordsFor(k).forEach(w=>{if(!out.includes(w.w))out.push(w.w);});});return out;}
-function xpTotal(){let xp=0;for(const k in S.days){const d=S.days[k];const ws=wordsFor(k);
-  ws.forEach(w=>{const a=d.learn[w.w];if(a!==undefined){xp+=5;if(a===w.def)xp+=5;}});
-  (d.recall.items||[]).forEach(it=>{if(d.recall[it.w]===it.w)xp+=10;});
-  if(d.reason!=null)xp+=d.reason===0?20:5;
-  if(d.write&&d.write.done)xp+=30+(d.write.bonus?10:0);}return xp;}
+/* Hearts (the daily challenge's reward, replacing XP):
+   Learn: 1 for a correct first guess · Recall: 1 per correct gap · Reason: 2 for the right answer
+   Write: 2 for submitting, +1 if you used all of today's words (and the review word) */
+const HEARTS={learn:1,recall:1,reason:2,write:2,bonus:1};
+function dayHearts(k){const d=S.days[k];if(!d)return 0;let n=0;
+  wordsFor(k).forEach(w=>{if(d.learn[w.w]===w.def)n+=HEARTS.learn;});
+  (d.recall.items||[]).forEach(it=>{if(d.recall[it.w]===it.w)n+=HEARTS.recall;});
+  if(d.reason===0)n+=HEARTS.reason;
+  if(d.write&&d.write.done)n+=HEARTS.write+(d.write.bonus?HEARTS.bonus:0);return n;}
+function heartsTotal(){let n=0;for(const k in S.days)n+=dayHearts(k);return n;}
 function streak(){let n=0;let d=new Date();const done=k=>S.days[k]&&S.days[k].write&&S.days[k].write.done;
   if(!done(keyOf(d)))d.setDate(d.getDate()-1);
   while(done(keyOf(d))){n++;d.setDate(d.getDate()-1);}return n;}
@@ -565,10 +636,8 @@ const stepDone={learn:()=>learnDone(TODAY),
 
 /* ---------- Header ---------- */
 function renderHeader(){
-  const t=fromKey(TODAY);const n=dayIdx(TODAY)+1;
-  document.getElementById("entryLine").textContent=t.toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric",year:"numeric"})+(n>0?"  ·  Day "+n+" of practice":"");
   document.getElementById("sStreak").textContent=streak();
-  document.getElementById("sXP").textContent=xpTotal();
+  document.getElementById("sXP").textContent=heartsTotal();
   document.getElementById("sWords").textContent=learned().length;
   const wk=document.getElementById("week");wk.innerHTML="";
   for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const k=keyOf(d);
@@ -578,9 +647,10 @@ function renderHeader(){
   // Home screen: one-line summary + how far today's challenge is
   const doneCount=steps.filter(([id])=>stepDone[id]()).length;
   document.getElementById("dailyStatus").textContent=doneCount===4?"Done for today ✓":doneCount?doneCount+"/4 stations done":"4 quick stations";
-  document.getElementById("homeStats").textContent="★ "+streak()+"-day streak  ·  "+xpTotal()+" XP  ·  "+learned().length+" words";
+  document.getElementById("homeStats").textContent="★ "+streak()+"-day streak  ·  ♥ "+heartsTotal()+" hearts  ·  "+learned().length+" words";
   renderScores();
-  document.getElementById("steps").innerHTML=steps.map(([id,l],i)=>`<a href="#${id}" class="${stepDone[id]()?"done":""}"><span class="n">${stepDone[id]()?"✓":i+1}</span>${l}</a>`).join("");
+  // Today's random theme (shown in the tag under the title)
+  document.getElementById("theme").textContent="Theme: "+themeFor(TODAY)[0];
 }
 
 /* ---------- Learn ---------- */
@@ -593,7 +663,7 @@ function renderLearn(){
     const ans=d.learn[w.w];
     const optHtml=opts.map(o=>{let c="opt";if(ans!==undefined){if(o===w.def)c+=" right";else if(o===ans)c+=" wrong";else c+=" dim";}
       return `<button class="${c}" data-learn="${esc(w.w)}" data-v="${esc(o)}" ${ans!==undefined?"disabled":""}>${esc(o)}</button>`;}).join("");
-    const rev=ans!==undefined?`<div class="reveal"><span class="verdict ${ans===w.def?"g":"b"}">${ans===w.def?"NICE GUESS · +10 XP":"NOW YOU KNOW · +5 XP"}</span><p class="def">${esc(w.def)}</p><p class="ex">“${esc(w.ex)}”</p></div>`:"";
+    const rev=ans!==undefined?`<div class="reveal"><span class="verdict ${ans===w.def?"g":"b"}">${ans===w.def?"NICE GUESS · +1 ♥":"NOW YOU KNOW · NO HEART THIS TIME"}</span><p class="def">${esc(w.def)}</p><p class="ex">“${esc(w.ex)}”</p></div>`:"";
     return `<div class="word"><div class="headword"><h3>${esc(w.w)}</h3><span class="pron">/${esc(w.pr)}/</span><span class="pos">${esc(w.pos)}</span></div>
       ${ans===undefined?`<p class="q">What do you think <b>${esc(w.w)}</b> means?</p>`:""}<div class="opts">${optHtml}</div>${rev}</div>`;
   }).join("");
@@ -622,7 +692,7 @@ function renderRecall(){
     const sent=esc(parts[0])+`<span class="gap">${ans!==undefined?esc(m?m[0]:w.w):"&nbsp;"}</span>`+esc(parts.slice(1).join(""));
     const opts=it.opts.map(o=>{let c="opt";if(ans!==undefined){if(o===it.w)c+=" right";else if(o===ans)c+=" wrong";else c+=" dim";}
       return `<button class="${c}" data-recall="${esc(it.w)}" data-v="${esc(o)}" ${ans!==undefined?"disabled":""}>${esc(o)}</button>`;}).join("");
-    const v=ans!==undefined?`<span class="verdict ${ans===it.w?"g":"b"}">${ans===it.w?"CORRECT · +10 XP":"IT WAS “"+esc(it.w).toUpperCase()+"”: "+esc(w.def)}</span>`:"";
+    const v=ans!==undefined?`<span class="verdict ${ans===it.w?"g":"b"}">${ans===it.w?"CORRECT · +1 ♥":"IT WAS “"+esc(it.w).toUpperCase()+"”: "+esc(w.def)}</span>`:"";
     return `<div class="blank-item">${it.prev?'<span class="label">Review</span>':'<span class="label">Today</span>'}<p class="sentence">${sent}</p><div class="chips-opts">${opts}</div>${v}</div>`;
   }).join("");
 }
@@ -636,11 +706,11 @@ function renderReason(){
   const opts=order.map(i=>{let c="opt";if(ans!=null){if(i===0)c+=" right";else if(i===ans)c+=" wrong";else c+=" dim";}
     return `<button class="${c}" data-reason="${i}" ${ans!=null?"disabled":""}>${esc(p[2][i])}</button>`;}).join("");
   document.getElementById("reasonBox").innerHTML=`<span class="puzzle-type">${esc(p[0])}</span><p class="puzzle-q">${esc(p[1])}</p><div class="opts">${opts}</div>`+
-    (ans!=null?`<div class="reveal"><span class="verdict ${ans===0?"g":"b"}">${ans===0?"CORRECT · +20 XP":"NOT QUITE · +5 XP FOR TRYING"}</span><p>${esc(p[4])}</p></div>`:"");
+    (ans!=null?`<div class="reveal"><span class="verdict ${ans===0?"g":"b"}">${ans===0?"CORRECT · +2 ♥":"NOT QUITE · NO HEART THIS TIME"}</span><p>${esc(p[4])}</p></div>`:"");
 }
 
 /* ---------- Write ---------- */
-function promptFor(){const d=day();return PROMPTS[mod(dayIdx(TODAY)*5+(d.write.promptShift||0),PROMPTS.length)];}
+function promptFor(){const d=day();const ps=themeFor(TODAY)[1];return ps[mod(d.write.promptShift||0,ps.length)];}
 function tipFor(){return TIPS[mod(dayIdx(TODAY),TIPS.length)];}
 function reviewWord(){const today=wordsFor(TODAY).map(w=>w.w);const prev=learned().filter(w=>!today.includes(w));
   if(!prev.length)return null;return prev[Math.floor(rng(hash(TODAY+"rw"))()*prev.length)];}
@@ -683,13 +753,14 @@ async function submitWriting(){
   const d=day();const first=!d.write.done;
   d.write.text=text;d.write.done=true;d.write.bonus=d.write.bonus||a.all;d.write.prompt=promptFor()[1];
   save();renderAll(false);
-  if(first)document.getElementById("submitNote").textContent="Entry saved · +"+(30+(a.all?10:0))+" XP";
+  if(first)document.getElementById("submitNote").textContent="Entry saved · +"+(HEARTS.write+(a.all?HEARTS.bonus:0))+" ♥";
   if(!sampleFn){renderFeedback();return;}
   busy=true;renderWriteLive();
   const note=document.getElementById("submitNote");note.textContent="Reading your paragraph… this can take up to a minute.";
   const ws=wordsFor(TODAY).concat(a.rw?[BY[a.rw]]:[]);
   const prompt=`You are a supportive but honest writing coach for an adult improving their English writing, vocabulary, and reasoning. Evaluate the paragraph below.
 
+Theme of the day: ${themeFor(TODAY)[0]}
 Writing prompt: ${promptFor()[1]}
 Focus skill today: ${tipFor()[0]} — ${tipFor()[1]}
 Target vocabulary (word: meaning):
@@ -745,7 +816,34 @@ function renderLower(){
     '<p class="empty">Your paragraphs will collect here, one per day.</p>';
 }
 
-function renderAll(withWrite=true){renderHeader();renderLearn();renderRecall();renderReason();if(withWrite)renderWriteStatic();else renderWriteLive();renderLower();}
+/* ---------- Card stage: show one card at a time ----------
+   The stations still render all their items; applyCard() hides everything except the current card
+   and updates the section name, progress segments, arrows and score. */
+const SEC_NAMES={learn:"Learn",recall:"Recall",reason:"Reason",write:"Write"};
+const SEC_HELP={learn:"Guess the meaning",recall:"Fill the gap",reason:"Puzzle",write:"Write a paragraph"};
+function cards(){const d=day();const c=[];
+  wordsFor(TODAY).forEach((w,i)=>c.push({sec:"learn",i,done:d.learn[w.w]!==undefined}));
+  recallItems().forEach((it,i)=>c.push({sec:"recall",i,done:d.recall[it.w]!==undefined}));
+  c.push({sec:"reason",i:0,done:d.reason!=null});
+  c.push({sec:"write",i:0,done:!!d.write.done});
+  return c;}
+function applyCard(){
+  const C=cards();const d=day();d.card=Math.max(0,Math.min(C.length-1,d.card||0));const cur=C[d.card];
+  Object.keys(SEC_NAMES).forEach(sec=>{document.getElementById(sec).hidden=sec!==cur.sec;});
+  [...document.getElementById("learnList").children].forEach((el,i)=>{el.hidden=!(cur.sec==="learn"&&i===cur.i);});
+  [...document.getElementById("recallList").children].forEach((el,i)=>{el.hidden=!(cur.sec==="recall"&&i===cur.i);});
+  const inSec=C.filter(x=>x.sec===cur.sec);
+  document.getElementById("secName").textContent=SEC_NAMES[cur.sec]+" · "+SEC_HELP[cur.sec]+(inSec.length>1?" ("+(cur.i+1)+"/"+inSec.length+")":"");
+  document.getElementById("cardCount").textContent="Card "+(d.card+1)+" of "+C.length;
+  document.getElementById("steps").innerHTML=C.map((x,i)=>`<button type="button" class="seg${x.done?" done":""}${i===d.card?" cur":""}" data-card="${i}" aria-label="Card ${i+1}: ${SEC_NAMES[x.sec]}${x.done?", done":""}"></button>`).join("");
+  document.getElementById("cardPrev").disabled=d.card===0;
+  const next=document.getElementById("cardNext");next.disabled=d.card===C.length-1;
+  next.classList.toggle("ready",cur.done&&d.card<C.length-1); // nudge the ▶ once the card is answered
+  document.getElementById("dayScore").textContent="× "+dayHearts(TODAY);
+}
+function goCard(i){day().card=i;save();applyCard();const st=document.getElementById("secName");if(st.getBoundingClientRect().top<0)st.scrollIntoView({block:"start"});}
+
+function renderAll(withWrite=true){renderHeader();renderLearn();renderRecall();renderReason();if(withWrite)renderWriteStatic();else renderWriteLive();renderLower();applyCard();}
 
 /* ---------- Events ---------- */
 document.addEventListener("click",e=>{
@@ -758,6 +856,10 @@ document.addEventListener("click",e=>{
   else if(b.id==="submitBtn"){submitWriting();}
   else if(b.dataset.go){go(b.dataset.go);}
   else if(b.id==="nextFact"){showFact();}
+  else if(b.id==="likeBtn"||b.id==="dislikeBtn"){voteFact(b.id==="likeBtn"?1:-1);}
+  else if(b.dataset.card!==undefined){goCard(Number(b.dataset.card));}
+  else if(b.id==="cardPrev"){goCard((d.card||0)-1);}
+  else if(b.id==="cardNext"){goCard((d.card||0)+1);}
   else if(b.dataset.quiz!==undefined){answerQuiz(b.dataset.quiz);}
   else if(b.id==="quizNext"){Q.i++;Q.ans=null;renderQuiz();}
   else if(b.id==="quizAgain"){startQuiz();}
@@ -769,18 +871,18 @@ document.getElementById("essay").addEventListener("input",e=>{day().write.text=e
    Each character is one "pixel"; "." is transparent. Rendered as SVG
    rects with crispEdges so they stay sharp at any size.
    ===================================================================== */
-const PAL={o:"var(--edge)",w:"#FFFDF8",p:"#F4A3BF",r:"#E0587E",y:"var(--moon)",g:"#F2C14E",b:"#B98A5E",n:"#9CC98F"};
+const PAL={o:"var(--edge)",w:"#FFFDF8",p:"#F4A3BF",r:"#E0587E",g:"#F2C14E",b:"#B98A5E",f:"var(--primary-face)",s:"var(--primary-shade)",h:"#FFFFFF"};
 const SPRITES={
   heart:[".rr.rr.","rrprrrr","rprrrrr","rrrrrrr",".rrrrr.","..rrr..","...r..."],
   star:["...g...","...g...","..ggg..","ggggggg",".ggggg.","..ggg..",".gg.gg.","gg...gg"],
   trophy:["ggggggg","goggggo","g.ggg.g",".ggggg.","..ggg..","...g...","..ggg..",".bbbbb."],
   // "?" block, like the ones in old platformer games
   qblock:["ooooooooo","ogggggggo","oggoooggo","ogogggogo","oggggoggo","ogggogggo","ogggggggo","ogggogggo","ooooooooo"],
-  moon:["..yyyy..",".yyy....","yyy.....","yy......","yy......","yyy.....",".yyy....","..yyyy.."],
   bunny:["..oo....oo..",".owpo..opwo.",".owpo..opwo.",".owwoooowwo.","owwwwwwwwwwo","owwowwwwowwo","owpwwwwwwpwo","owwwwrrwwwwo",".owwwwwwwwo.","..oooooooo.."],
-  shroom:["..rrrr..",".rwrrwr.","rrrrrrrr","rwrrrrwr","..wwww..","..wwww..","..wwww.."],
-  flower:[".p.p.",".ppp.","ppgpp",".ppp.","..n..","..n.."]
 };
+// Pixel circle for the Random Fact button: outline, pink face, darker lower-right shading, white shine
+SPRITES.orb=Array.from({length:20},(_,y)=>Array.from({length:20},(_,x)=>{const dx=x+.5-10,dy=y+.5-10,d=Math.hypot(dx,dy);
+  return d>10?".":d>8.7?"o":(dx+dy>9.5&&d>6.5)?"s":(dx<-1.5&&dy<-1.5&&d>6.3&&d<7.8)?"h":"f";}).join(""));
 function sprite(name){
   const g=SPRITES[name];const h=g.length,w=Math.max(...g.map(r=>r.length));let rects="";
   g.forEach((row,y)=>[...row].forEach((c,x)=>{if(PAL[c])rects+=`<rect x="${x}" y="${y}" width="1.02" height="1.02" fill="${PAL[c]}"/>`;}));
@@ -788,18 +890,6 @@ function sprite(name){
 }
 function fillSprites(root=document){root.querySelectorAll("[data-sprite]").forEach(el=>{if(!el.firstChild)el.innerHTML=sprite(el.dataset.sprite);});}
 
-/* Title scene: twinkling stars, crescent moon, a stepped pixel hill, the bunny and a few flowers */
-function drawScene(){
-  const sc=document.getElementById("scene");const r=rng(7);let html="";
-  for(let i=0;i<16;i++)html+=`<span class="star${i%5===0?" big":""}" aria-hidden="true" style="left:${Math.floor(r()*96)+2}%;top:${Math.floor(r()*50)+3}%"></span>`;
-  // Hill: 8-unit-wide columns whose heights follow a gentle wave, so the top edge looks stepped
-  let cols="";for(let x=0;x<320;x+=8){const h=Math.round((26+10*Math.sin(x/38)+5*Math.sin(x/13))/4)*4;
-    cols+=`<rect x="${x}" y="${60-h}" width="8" height="${h}" fill="var(--hill)"/><rect x="${x}" y="${60-h}" width="8" height="3" fill="var(--hill-dark)"/>`;}
-  html+=`<svg class="hill" viewBox="0 0 320 60" preserveAspectRatio="none" aria-hidden="true" style="shape-rendering:crispEdges">${cols}</svg>`;
-  html+=`<span class="sprite moon" data-sprite="moon"></span><span class="sprite bunny" data-sprite="bunny"></span><span class="sprite shroom" data-sprite="shroom"></span>`;
-  [[22,6],[38,12],[60,5],[74,10]].forEach(([l,b])=>html+=`<span class="sprite flower" data-sprite="flower" style="left:${l}%;bottom:${b}%"></span>`);
-  sc.insertAdjacentHTML("afterbegin",html);fillSprites(sc);
-}
 
 /* =====================================================================
    Typewriter dialog: prints text a letter at a time like an old game.
@@ -819,7 +909,7 @@ function typeInto(el,html){
 }
 document.addEventListener("click",e=>{const box=e.target.closest(".dialog");if(!box)return;const p=box.querySelector("p");const cur=typers.get(p);if(cur)cur.finish();});
 
-const ABOUT="<b>WordSmith</b> is an interactive game that will help you improve your language abilities and your vocabulary. Pick a button below to begin!";
+const ABOUT="<b>Lenga</b> is an interactive game that will help you improve your language skills and grow your vocabulary, one little challenge a day. Pick a button below to begin!";
 
 /* =====================================================================
    Screens: home / challenge / facts / quiz / history.
@@ -831,7 +921,6 @@ function go(v){
   document.querySelectorAll(".view").forEach(el=>{el.hidden=el.dataset.view!==v;});
   window.scrollTo(0,0);
   if(v==="home")typeInto(document.getElementById("aboutText"),ABOUT);
-  if(v==="facts")showFact();
   if(v==="quiz"&&(!Q||Q.i>=Q.qs.length))startQuiz();
   if(v==="history")renderScores();
   try{history.replaceState(null,"","#"+v);}catch(e){}
@@ -839,44 +928,71 @@ function go(v){
 }
 
 /* =====================================================================
-   Random Facts: short word & language trivia shown in the dialog box.
+   Random Facts: press the round button → a picture, the fact, and Liked / Dislike.
+   Each fact is [emoji for its picture, text]. Votes are saved and will feed the stats page.
    ===================================================================== */
 const FACTS=[
-  "The word <b>nice</b> once meant \"foolish\" or \"ignorant\". It comes from the Latin <i>nescius</i>, \"not knowing\".",
-  "<b>Silly</b> started out meaning \"happy\" or \"blessed\" in Old English.",
-  "<b>Muscle</b> comes from the Latin <i>musculus</i>, \"little mouse\", maybe because a flexing muscle looks like a mouse moving under the skin.",
-  "<b>Goodbye</b> is a shortened form of \"God be with ye\".",
-  "<b>Robot</b> comes from the Czech word <i>robota</i>, \"forced labor\". It first appeared in Karel Čapek's 1920 play <i>R.U.R.</i>",
-  "<b>Alphabet</b> is made from the first two Greek letters: <i>alpha</i> and <i>beta</i>.",
-  "<b>Disaster</b> literally means \"bad star\". People once blamed bad luck on the position of the planets.",
-  "<b>Quarantine</b> comes from the Italian <i>quaranta giorni</i>, \"forty days\", the time ships had to wait before landing during plague outbreaks.",
-  "A <b>clue</b> was originally a \"clew\", a ball of thread, like the one Theseus used to find his way out of the labyrinth.",
-  "<b>Window</b> comes from the Old Norse <i>vindauga</i>: \"wind eye\".",
-  "<b>Daisy</b> comes from \"day's eye\", because the flower opens in the morning and closes at night.",
-  "<b>Emoji</b> has nothing to do with \"emotion\". It's Japanese: <i>e</i> (picture) + <i>moji</i> (character).",
-  "<b>Oxymoron</b> is itself an oxymoron: it joins the Greek <i>oxys</i> (sharp) and <i>moros</i> (dull).",
-  "<b>Avocado</b> comes from <i>ahuacatl</i>, a word in Nahuatl, the language of the Aztecs.",
-  "<b>Typewriter</b> can be typed using only the top row of letters on a standard keyboard.",
-  "<b>Bookkeeper</b> has three double letters in a row: oo, kk, ee.",
-  "<b>Uncopyrightable</b> is one of the longest English words that doesn't repeat a single letter.",
-  "<b>Strengths</b> has nine letters but only one vowel.",
-  "\"The quick brown fox jumps over the lazy dog\" is a <b>pangram</b>: a sentence that uses every letter of the alphabet.",
-  "A <b>palindrome</b> reads the same backwards and forwards, like \"level\", \"racecar\", or \"Was it a car or a cat I saw?\"",
-  "The verb <b>run</b> has more than 600 senses in the Oxford English Dictionary, one of the most of any English word.",
-  "Shakespeare's plays contain the earliest recorded uses of many English words, including <b>eyeball</b> and <b>bedroom</b>.",
-  "Researchers estimate that most adult native English speakers know somewhere around <b>20,000 to 35,000</b> words.",
-  "Reviewing a new word again after a few days (called <b>spaced repetition</b>) helps you remember it far longer than cramming. That's why the Recall station brings old words back!",
-  "<b>Ketchup</b> probably comes from a Hokkien Chinese word for a fermented fish sauce."
+  ["🤪","The word <b>nice</b> once meant \"foolish\" or \"ignorant\". It comes from the Latin <i>nescius</i>, \"not knowing\"."],
+  ["😇","<b>Silly</b> started out meaning \"happy\" or \"blessed\" in Old English."],
+  ["🐭","<b>Muscle</b> comes from the Latin <i>musculus</i>, \"little mouse\", maybe because a flexing muscle looks like a mouse moving under the skin."],
+  ["👋","<b>Goodbye</b> is a shortened form of \"God be with ye\"."],
+  ["🤖","<b>Robot</b> comes from the Czech word <i>robota</i>, \"forced labor\". It first appeared in Karel Čapek's 1920 play <i>R.U.R.</i>"],
+  ["🔤","<b>Alphabet</b> is made from the first two Greek letters: <i>alpha</i> and <i>beta</i>."],
+  ["🌠","<b>Disaster</b> literally means \"bad star\". People once blamed bad luck on the position of the planets."],
+  ["⛵","<b>Quarantine</b> comes from the Italian <i>quaranta giorni</i>, \"forty days\", the time ships had to wait before landing during plague outbreaks."],
+  ["🧶","A <b>clue</b> was originally a \"clew\", a ball of thread, like the one Theseus used to find his way out of the labyrinth."],
+  ["🪟","<b>Window</b> comes from the Old Norse <i>vindauga</i>: \"wind eye\"."],
+  ["🌼","<b>Daisy</b> comes from \"day's eye\", because the flower opens in the morning and closes at night."],
+  ["😀","<b>Emoji</b> has nothing to do with \"emotion\". It's Japanese: <i>e</i> (picture) + <i>moji</i> (character)."],
+  ["✂️","<b>Oxymoron</b> is itself an oxymoron: it joins the Greek <i>oxys</i> (sharp) and <i>moros</i> (dull)."],
+  ["🥑","<b>Avocado</b> comes from <i>ahuacatl</i>, a word in Nahuatl, the language of the Aztecs."],
+  ["⌨️","<b>Typewriter</b> can be typed using only the top row of letters on a standard keyboard."],
+  ["📚","<b>Bookkeeper</b> has three double letters in a row: oo, kk, ee."],
+  ["©️","<b>Uncopyrightable</b> is one of the longest English words that doesn't repeat a single letter."],
+  ["💪","<b>Strengths</b> has nine letters but only one vowel."],
+  ["🦊","\"The quick brown fox jumps over the lazy dog\" is a <b>pangram</b>: a sentence that uses every letter of the alphabet."],
+  ["🏎️","A <b>palindrome</b> reads the same backwards and forwards, like \"level\", \"racecar\", or \"Was it a car or a cat I saw?\""],
+  ["🏃","The verb <b>run</b> has more than 600 senses in the Oxford English Dictionary, one of the most of any English word."],
+  ["🎭","Shakespeare's plays contain the earliest recorded uses of many English words, including <b>eyeball</b> and <b>bedroom</b>."],
+  ["🧠","Researchers estimate that most adult native English speakers know somewhere around <b>20,000 to 35,000</b> words."],
+  ["🔁","Reviewing a new word again after a few days (called <b>spaced repetition</b>) helps you remember it far longer than cramming. That's why the Recall cards bring old words back!"],
+  ["🍅","<b>Ketchup</b> probably comes from a Hokkien Chinese word for a fermented fish sauce."]
 ];
 let factIdx=-1;
+// Draw the emoji very small, then CSS scales the canvas up with image-rendering:pixelated → instant pixel art.
+// If the device can't draw the emoji, fall back to the "?" block sprite.
+function drawFactImage(emoji){
+  const cv=document.getElementById("factImg");const ctx=cv.getContext("2d");ctx.clearRect(0,0,20,20);
+  ctx.textAlign="center";ctx.textBaseline="middle";
+  ctx.font='16px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';ctx.fillText(emoji,10,11);
+  // Make every pixel fully solid or fully clear so edges look like hard pixel art, not a blurry photo
+  let ink=0;try{const im=ctx.getImageData(0,0,20,20);const px=im.data;
+    for(let i=3;i<px.length;i+=4){px[i]=px[i]>110?255:0;ink+=px[i]>0;}ctx.putImageData(im,0,0);}catch(e){ink=1;}
+  if(!ink){const g=SPRITES.qblock;const css=getComputedStyle(document.documentElement);
+    const col=c=>c==="o"?css.getPropertyValue("--edge").trim():PAL[c];
+    g.forEach((row,y)=>[...row].forEach((c,x)=>{if(PAL[c]){ctx.fillStyle=col(c);ctx.fillRect(x+5,y+5,1,1);}}));}
+}
 function showFact(){
   // Prefer facts you haven't seen yet; once all are seen, pick any (but not the same one twice in a row)
   const unseen=FACTS.map((_,i)=>i).filter(i=>!S.facts.includes(i)&&i!==factIdx);
   const pool=unseen.length?unseen:FACTS.map((_,i)=>i).filter(i=>i!==factIdx);
   factIdx=pool[Math.floor(Math.random()*pool.length)];
   if(!S.facts.includes(factIdx)){S.facts.push(factIdx);save();}
-  typeInto(document.getElementById("factText"),FACTS[factIdx]);
-  document.getElementById("factCount").textContent="Discovered "+S.facts.length+" / "+FACTS.length+" facts";
+  document.getElementById("factCard").hidden=false;
+  document.getElementById("factHint").textContent="Tap again for another fact";
+  drawFactImage(FACTS[factIdx][0]);
+  typeInto(document.getElementById("factText"),FACTS[factIdx][1]);
+  renderVotes();
+}
+function voteFact(v){if(factIdx<0)return;
+  // pressing the same button again clears the vote
+  if(S.factVotes[factIdx]===v)delete S.factVotes[factIdx];else S.factVotes[factIdx]=v;save();renderVotes();}
+function renderVotes(){
+  const v=S.factVotes[factIdx];
+  document.getElementById("likeBtn").setAttribute("aria-pressed",String(v===1));
+  document.getElementById("dislikeBtn").setAttribute("aria-pressed",String(v===-1));
+  const liked=Object.values(S.factVotes).filter(x=>x===1).length;
+  document.getElementById("factCount").textContent="Discovered "+S.facts.length+" / "+FACTS.length+" facts  ·  Liked "+liked;
 }
 
 /* =====================================================================
@@ -904,13 +1020,13 @@ function answerQuiz(v){
   if(v===q.correct)Q.score++;else Q.lives--;
   renderQuiz();
 }
-function quizRank(s,n){const f=s/n;return f===1?"Word Wizard":f>=.8?"Wordsmith":f>=.5?"Apprentice":"Novice";}
+function quizRank(s,n){const f=s/n;return f===1?"Word Wizard":f>=.8?"Scholar":f>=.5?"Apprentice":"Novice";}
 function renderQuiz(){
   const box=document.getElementById("quizBox");
   const over=Q.i>=Q.qs.length||Q.lives<=0;
   if(over){
     // Save each finished run once
-    if(!Q.saved){Q.saved=true;Q.prevBest=S.quiz.runs.length?Math.max(...S.quiz.runs.map(r=>r.s)):0;S.quiz.runs.push({d:TODAY,s:Q.score,n:QN});save();renderHeader();}
+    if(!Q.saved){Q.saved=true;Q.prevBest=S.quiz.runs.length?Math.max(...S.quiz.runs.map(r=>r.s)):0;S.quiz.runs.push({d:TODAY,s:Q.score,n:QN,a:Q.score+(LIVES-Q.lives)});save();renderHeader();}
     const best=Math.max(...S.quiz.runs.map(r=>r.s));
     box.innerHTML=`<div class="quiz-end"><span class="label">${Q.lives<=0?"Game over":"Quiz complete"}</span>
       <span class="ico" data-sprite="${Q.score>=8?"trophy":"star"}" style="width:56px;height:56px"></span>
@@ -937,8 +1053,38 @@ function renderQuiz(){
   if(done){const n=document.getElementById("quizNext");n&&n.focus({preventScroll:true});}
 }
 
+/* Skill bars: % correct per part of the game, across every day played */
+const SKILL_TIPS={vocab:"Before picking an answer, look for word parts you already know (like \"bene-\" = good).",
+  memory:"Skim your word bank before the Recall cards. Seeing a word again is what makes it stick.",
+  reason:"Read the puzzle twice and rule out the clearly wrong answers first.",
+  quiz:"Play one quick quiz a day. Short, frequent practice beats long sessions."};
+function skillStats(){
+  let v=[0,0],m=[0,0],r=[0,0];
+  for(const k in S.days){const d=S.days[k];
+    wordsFor(k).forEach(w=>{const a=d.learn[w.w];if(a!==undefined){v[1]++;if(a===w.def)v[0]++;}});
+    (d.recall.items||[]).forEach(it=>{const a=d.recall[it.w];if(a!==undefined){m[1]++;if(a===it.w)m[0]++;}});
+    if(d.reason!=null){r[1]++;if(d.reason===0)r[0]++;}}
+  const q=S.quiz.runs.reduce((acc,x)=>[acc[0]+x.s,acc[1]+(x.a!=null?x.a:x.n)],[0,0]);
+  return [["vocab","Vocabulary","Learn cards",v],["memory","Memory","Recall cards",m],["reason","Reasoning","Daily puzzle",r],["quiz","Quiz","Test your Knowledge",q]]
+    .map(([id,name,from,[ok,tot]])=>({id,name,from,ok,tot,p:tot?Math.round(ok/tot*100):null}));
+}
+function renderSkills(){
+  const rows=skillStats();const tried=rows.filter(x=>x.p!=null);
+  // only call something "needs improvement" once there are a few answers to judge from
+  const weak=tried.filter(x=>x.tot>=3).sort((a,b)=>a.p-b.p)[0];
+  document.getElementById("skills").innerHTML=rows.map(x=>{const isWeak=weak&&x.id===weak.id&&tried.length>1;
+    return `<div class="skill${isWeak?" weak":""}${x.p==null?" none":""}" title="${x.p==null?"No answers yet":x.ok+" of "+x.tot+" correct"}">
+      <span class="skill-name">${esc(x.name)}<small>${isWeak?"Needs improvement":esc(x.from)}</small></span>
+      <div class="skill-track" role="img" aria-label="${esc(x.name)}: ${x.p==null?"no answers yet":x.p+"% correct"}"><div class="skill-fill" style="width:${x.p||0}%"></div></div>
+      <span class="skill-pct">${x.p==null?"–":x.p+"%"}</span></div>`;}).join("");
+  const tip=document.getElementById("skillTip");
+  if(weak&&tried.length>1){tip.hidden=false;tip.textContent="Needs improvement: "+weak.name+" ("+weak.p+"%). Tip: "+SKILL_TIPS[weak.id];}
+  else{tip.hidden=false;tip.textContent=tried.length?"Keep playing! After a few more answers, this will show which skill to practice.":"No answers yet. Play the Daily Challenge or a quiz to fill these bars.";}
+}
+
 /* Scores / History: best quiz score and the 10 most recent runs */
 function renderScores(){
+  renderSkills();
   const runs=S.quiz.runs;
   document.getElementById("sBest").textContent=runs.length?Math.max(...runs.map(r=>r.s))+"/"+QN:"–";
   document.getElementById("runs").innerHTML=runs.length?runs.slice(-10).reverse().map(r=>
@@ -946,7 +1092,36 @@ function renderScores(){
     '<p class="empty">No quiz runs yet. Try "Test your Knowledge" from the home screen.</p>';
 }
 
-drawScene();fillSprites();
+/* Bunny cursor: draw the bunny sprite onto a tiny canvas and use it as the cursor for buttons.
+   It is drawn at 2× and marked as 2× (image-set), so it shows at about 12×10 px and stays sharp on retina screens. */
+function setBunnyCursor(){
+  try{
+    const g=SPRITES.bunny,S2=2,cv=document.createElement("canvas");cv.width=g[0].length*S2;cv.height=g.length*S2;
+    const ctx=cv.getContext("2d");const edge=getComputedStyle(document.documentElement).getPropertyValue("--edge").trim();
+    g.forEach((row,y)=>[...row].forEach((c,x)=>{const col=c==="o"?edge:PAL[c];if(col){ctx.fillStyle=col;ctx.fillRect(x*S2,y*S2,S2,S2);}}));
+    const url=cv.toDataURL("image/png");
+    const st=document.createElement("style");
+    // first line: plain image (works everywhere); second/third: the sharper 2× version where supported
+    st.textContent=`button:not(:disabled){cursor:url(${url}) 12 10,pointer;cursor:-webkit-image-set(url(${url}) 2x) 6 5,pointer;cursor:image-set(url(${url}) 2x) 6 5,pointer}`;
+    document.head.appendChild(st);
+  }catch(e){}
+}
+
+/* Click effect: the button flashes and a few tiny pixel hearts/sparkles pop out from the click point */
+document.addEventListener("pointerdown",e=>{
+  const b=e.target.closest("button");if(!b||b.disabled)return;
+  b.classList.remove("flash");void b.offsetWidth;b.classList.add("flash");
+  if(REDUCED)return;
+  const heart=sprite("heart");
+  for(let i=0;i<7;i++){const el=document.createElement("span");const ang=i/7*Math.PI*2+Math.random()*.5,dist=22+Math.random()*18;
+    el.className="burst"+(i%3===0?" h":"");if(i%3===0)el.innerHTML=heart;
+    el.style.left=e.clientX+"px";el.style.top=e.clientY+"px";
+    el.style.setProperty("--dx",Math.round(Math.cos(ang)*dist)+"px");el.style.setProperty("--dy",Math.round(Math.sin(ang)*dist)+"px");
+    document.body.appendChild(el);setTimeout(()=>el.remove(),500);}
+});
+
+fillSprites();
+setBunnyCursor();
 renderAll();
 go(location.hash.slice(1)); // open the screen named in the URL, or the home screen
 
@@ -968,7 +1143,8 @@ go(location.hash.slice(1)); // open the screen named in the URL, or the home scr
           if(loc.reason==null&&r.reason!=null)loc.reason=r.reason;
           if(r.write&&r.write.done&&!(loc.write&&loc.write.done))loc.write=JSON.parse(JSON.stringify(r.write));}}
     }
-    if(snap.exists){const rq=(snap.data()||{}).quiz;if(rq&&Array.isArray(rq.runs)&&rq.runs.length>S.quiz.runs.length)S.quiz=rq;}
+    if(snap.exists){const rem=snap.data()||{};const rq=rem.quiz;if(rq&&Array.isArray(rq.runs)&&rq.runs.length>S.quiz.runs.length)S.quiz=rq;
+      if(rem.factVotes&&typeof rem.factVotes==="object")S.factVotes=Object.assign({},rem.factVotes,S.factVotes);}
     setSync("Synced to your account");save();renderAll();
   }catch(e){}
 })();
